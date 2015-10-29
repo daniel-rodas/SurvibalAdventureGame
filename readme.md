@@ -1,6 +1,6 @@
 Dependencies:
 
-Download Toxic Libs from toxiclibs.org and install in your Processing libraries folder
+Download Toxic Libs from toxiclibs.org and install in your Processing libraries folder from http://toxiclibs.org/downloads/
 
 1.a Sketch -> Import Library... -> Add Library... 
 
