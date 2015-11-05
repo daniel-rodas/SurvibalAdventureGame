@@ -1,2 +1,3 @@
-public abstract class SceneLayer extends Scene {
+public abstract class SceneLayer extends Scene 
+{
 }
