@@ -1,11 +1,20 @@
 public class Victim extends Player 
 {
-  Victim(Vec2D loc) {
-    super(loc);
-  }
   private float pain;
 
-  public void CryForHelp() {
+  Victim(Vec2D loc) 
+  {
+    super(loc);
+  }
+
+  public void display()
+  {
+    fill(235, 123, 52);
+    rect(x, y, 25, 45);
+  }
+
+  public void CryForHelp() 
+  {
   }
 }
 

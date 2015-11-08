@@ -1,4 +1,4 @@
-public class CheapOfficeFurniture extends Node 
+abstract public class CheapOfficeFurniture extends OfficeNode 
 {
   CheapOfficeFurniture (Vec2D loc)
   {

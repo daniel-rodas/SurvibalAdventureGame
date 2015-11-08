@@ -20,12 +20,14 @@ public abstract class State
   float ax, ay;
 
   // shortcut constructor
-  State(String name, String spritesheet) {
+  State(String name, String spritesheet) 
+  {
     this(name, spritesheet, 1, 1);
   }
 
   // bigger shortcut constructor
-  State(String _name, String spritesheet, int rows, int cols) {
+  State(String _name, String spritesheet, int rows, int cols) 
+  {
     name = _name;
     // TODO implement Sprite
     //    sprite = new Sprite(spritesheet, rows, cols);
@@ -54,7 +56,8 @@ public abstract class State
    * add a linear path to the state
    */
   // TODO implement addPathLine method
-  void addPathLine(float x1, float y1, float x2, float y2, float duration) {
+  void addPathLine(float x1, float y1, float x2, float y2, float duration)
+  {
     //    sprite.addPathLine(x1, y1, 1, 1, 0, x2, y2, 1, 1, 0, duration);
   }
 
@@ -104,7 +107,8 @@ public abstract class State
   /**
    * Make this state last X frames.
    */
-  void setDuration(float _duration) {
+  void setDuration(float _duration) 
+  {
     setLooping(false);
     duration = (int) _duration;
   }
@@ -112,7 +116,8 @@ public abstract class State
   /**
    * bind this state to an player
    */
-  void setPlayer(Player _player) {
+  void setPlayer(Player _player) 
+  {
     player = _player;
     // TODO implement Sprite
     //    player.width = sprite.width;
@@ -146,7 +151,8 @@ public abstract class State
   }
 
   // signal to the player that the sprite is done running its path
-  void finished() {
+  void finished() 
+  {
     if (player!=null) 
     {
       // TODO implement State and Sprite
@@ -167,9 +173,11 @@ public abstract class State
   }
 
   // drawing the state means draw the sprite
-  void draw(boolean disabled) {
+  void draw(boolean disabled) 
+  {
     // if disabled, only draw every other frame
-    if (disabled && frameCount%2==0) {
+    if (disabled && frameCount%2==0) 
+    {
     }
     //otherwise, draw all frames
     else { 

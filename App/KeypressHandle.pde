@@ -17,24 +17,30 @@ public class KeypressHandle
   };
 
   // if pressed, and part of our known keyset, mark key as "down"
-  public void setIfTrue(int mark, int target) {
-    if (!locked[target]) {
-      if (mark==target) {
+  public void setIfTrue(int mark, int target) 
+  {
+    if (!locked[target]) 
+    {
+      if (mark==target) 
+      {
         keyDown[target] = true;
       }
     }
   }
 
   // if released, and part of our known keyset, mark key as "released"
-  public void unsetIfTrue(int mark, int target) {
-    if (mark==target) {
+  public void unsetIfTrue(int mark, int target) 
+  {
+    if (mark==target) 
+    {
       locked[target] = false;
       keyDown[target] = false;
     }
   }
 
   // lock a key so that it cannot be triggered repeatedly
-  public void ignore(char key) {
+  public void ignore(char key) 
+  {
     int keyCode = int(key);
     locked[keyCode] = true;
     keyDown[keyCode] = false;
@@ -43,7 +49,6 @@ public class KeypressHandle
   // add a key listener
   public void handleKey(char key) 
   {
-    
     int keyCode = int(key), 
     len = keyCodes.length;
     print("handleKey : " + key + ", KeyCode : " + keyCode + " \n");
@@ -54,30 +59,14 @@ public class KeypressHandle
   }
 
   // check whether a key is pressed or not
-  public boolean isKeyDown(char key) 
+  public boolean isKeyDown(char k) 
   {
-    print("Testing Key " + key + " \n" );
-    int keyCode = int(key);
-    return keyDown[keyCode];
-  }
-
-  public boolean noKeysDown() {
-    for (boolean b : keyDown) { 
-      if (b) return false;
+    print("Testing K " + k + " \n" );
+    if ( (key == Character.toUpperCase(k)) || (key == Character.toLowerCase(k)) )
+    {
+      return true;
     }
-    for (boolean b : locked) { 
-      if (b) return false;
-    }
-    return true;
-  }
-  
-  
-  /**
-   * Does the indicated x/y coordinate fall inside this drawable thing's region?
-   */
-  boolean over(float _x, float _y) {
-    if (active == null) return false;
-    return active.over(_x - getX(), _y - getY());
+    return false;
   }
 }
 

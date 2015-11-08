@@ -1,2 +1,3 @@
-public abstract class GamePlaySceneLayer extends SceneLayer {
+public abstract class GamePlaySceneLayer extends SceneLayer 
+{
 }
