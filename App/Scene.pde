@@ -23,10 +23,9 @@ public abstract class Scene
 
   public void display()
   {
-
     //    Display world bounds
     bounds = physics.getWorldBounds();
-    
+    fill(128);
     rect(bounds.x,bounds.y, bounds.width, bounds.height);
 
     // Display all node objects, Players, OfficeFurniture, Door, Stairs, etc.

@@ -16,7 +16,7 @@ public abstract class Node extends VerletParticle2D
   }
 
 //  void collideEqualMass(Node other) {
-//    float d = PVector.dist(loc, other.loc);
+//    float d = distanceTo(other);
 //    float sumR = r + other.r;
 //    // Are they colliding?
 //    if (!colliding && d < sumR) {

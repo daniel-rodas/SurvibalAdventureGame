@@ -33,7 +33,6 @@ abstract public class Player extends Node
   // handle key presses
   public void handleInput() 
   {
-    print( " handleInput, key: " + key + " keyCode: " + keyCode + "\n" );
     // isKeyDown() is a method from a KeypressHandle helper class
     if (keyHandle.isKeyDown('W')) 
     { 
