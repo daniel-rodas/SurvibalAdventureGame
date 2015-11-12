@@ -9,7 +9,7 @@ public class Door extends OfficeNode
   {
     // bottom is a Vec2D to help detect the distance between the foot of the Stairs and the Player
 
-    if ( this.distanceTo(p) < 10 && p.keyHandle.isKeyDown('W') )
+    if ( this.distanceTo(p) < 15 && p.keyHandle.isKeyDown('W') )
     {
       fill(34, 46, 200);
       rect(100, 100, 45, 36);

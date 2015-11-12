@@ -51,7 +51,6 @@ public class KeypressHandle
   {
     int keyCode = int(key), 
     len = keyCodes.length;
-    print("handleKey : " + key + ", KeyCode : " + keyCode + " \n");
     int[] _tmp = new int[len+1];
     arrayCopy(keyCodes, 0, _tmp, 0, len);
     _tmp[len] = keyCode;
@@ -61,7 +60,6 @@ public class KeypressHandle
   // check whether a key is pressed or not
   public boolean isKeyDown(char k) 
   {
-    print("Testing K " + k + " \n" );
     if ( (key == Character.toUpperCase(k)) || (key == Character.toLowerCase(k)) )
     {
       return true;

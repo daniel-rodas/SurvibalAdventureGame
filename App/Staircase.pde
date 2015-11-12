@@ -1,16 +1,17 @@
 public class Staircase extends Node 
 {
   PShape s;  // The PShape object
-  int steps;
   Vec2D bottom;
   Vec2D top;
+  Path path;
+  boolean isClimbing;
   Staircase (Vec2D loc) 
   {
     super(loc);
-
+    isClimbing = false;
     bottom = new Vec2D();
     top = new Vec2D();
-    r = 8;
+    path = new Path();
     s = createShape();
     s.beginShape();
     s.fill(0, 0, 255);
@@ -47,33 +48,59 @@ public class Staircase extends Node
     s.vertex(140, 0);
     s.vertex(140, 140);
     s.endShape();
+    this.width = 140;
+    this.height = 140;
   }
 
-  public boolean GoUp(Player p) 
+  public void GoUp(Player p) 
   {
+
     // bottom is a Vec2D to help detect the distance between the foot of the Stairs and the Player
+    fill(245, 245, 250, 0.4);
     bottom.set(x, y);
-    
+    ellipse(bottom.x, bottom.y, 30, 30);
+    top.set(bottom.x + this.width, bottom.y - this.height);
+    ellipse(top.x, top.y, 25, 25);
+
+    // is Player p distance to the bottom of stairs 
+    // less than 10 pixels and is the Player p holding down 'w' 
     if ( bottom.distanceTo(p) < 10 && p.keyHandle.isKeyDown('W') )
     {
+
+      pushStyle();
       fill(34, 46, 200);
-      rect(100, 100, 45, 36);
-      return true;
+      rectMode(CENTER);
+      rect(top.x, top.y, 100, 100);
+      popStyle();
+      print("Going up stairs. \n");
+
+      // Set Path for Player to follow
+      path.setPath(bottom, top);
+      isClimbing = true;
     }
-    return false;
+
+    if (isClimbing)
+    {
+      if ( top.distanceTo(p) > 10 )
+      {
+        p.followPath(path);
+      }
+    }
+
+    if ( top.distanceTo(p) < 10 && p.keyHandle.isKeyDown('S') )
+    {
+      isClimbing = false;
+    }
   }
 
-  public Node GoDown(Node n) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public void GoDown(Node n) {
+    isClimbing = true;
   }
 
   public void display()
   {
-    fill(140);
-    shape(s, x, y - 140);
-    // Foot of the Staircase
-    fill(255);
-    rect(x, y, 10, 10);
+    fill(31, 107, 178);
+    shape(s, x, y - this.height);
   }
 }
 

@@ -1,28 +1,27 @@
 public class OfficeScene extends GamePlayScene 
 {
   ArrayList<Player> players;
-
-  private Player playerOne;
-
-  private Player playerTwo;
-
-  public ArrayList<OfficeNode> officeNodes;
-
-  protected CheapOfficeFurniture deskOne;
-
-  protected CheapOfficeFurniture deskTwo;
-
-  protected Door doorOne;
-
+  Player playerOne;
+  Player playerTwo;
+  ArrayList<OfficeNode> officeNodes;
+  CheapOfficeFurniture deskOne;
+  CheapOfficeFurniture deskTwo;
+  Door doorOne;
   Staircase stairsOne;
+  
+
   private OfficeScene()
   {
+    
     // Create Staircase for Scene
-    stairsOne = new Staircase( new Vec2D( width - 140, 100  )) ;
+    stairsOne = new Staircase( new Vec2D( width - 140, 0  )) ;
     nodes.add(stairsOne);
-    // Add door
+
+    // Add Path for PlayerOne to fallow upstairs
+
     doorOne = new Door( new Vec2D( width - 50, 100 )) ;
     nodes.add(doorOne);
+
 
     // Create players for Scene 
     players = new ArrayList<Player>();
@@ -41,25 +40,24 @@ public class OfficeScene extends GamePlayScene
     officeNodes.add(deskTwo);
     // add deskTwo to global Scene nodes arrayList
     nodes.add(deskTwo);
-
-    for ( Node n : nodes )
-    {
-      // Give Players physics properties
-      physics.addParticle(n);
-      physics.addBehavior(new GravityBehavior(new Vec2D(0, 0.11)));
-    }
+    addNodesToWorld();
+    addSpringsToWorld();
   }
 
   public void display()
   {
+    background(240);
     super.display();
-
     // Monitor Playersto see if they are at the foot of the Stairs.
     for ( Player p : players )
     {
       stairsOne.GoUp(p);
       doorOne.Enter(p);
     }
+
   }
+  
+
 }
+
 
