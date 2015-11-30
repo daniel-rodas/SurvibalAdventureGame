@@ -1,6 +1,6 @@
 Dependencies:
 
-Download Toxic Libs from toxiclibs.org and install in your Processing libraries folder from http://toxiclibs.org/downloads/
+Download Toxic Libs from toxiclibs.org and install in your Processing libraries folder from https://bitbucket.org/postspectacular/toxiclibs/downloads/toxiclibs-complete-0020.zip
 
 1.a Sketch -> Import Library... -> Add Library... 
 
