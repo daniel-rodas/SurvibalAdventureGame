@@ -10,7 +10,7 @@ public class Staircase extends Node
     super(loc);
     isClimbing = false;
     bottom = new Vec2D();
-    top = new Vec2D();
+
     path = new Path();
     s = createShape();
     s.beginShape();
@@ -54,37 +54,47 @@ public class Staircase extends Node
 
   public void GoUp(Player p) 
   {
-
     // bottom is a Vec2D to help detect the distance between the foot of the Stairs and the Player
     fill(245, 245, 250, 0.4);
-    bottom.set(x, y);
+    bottom = new Vec2D(x, y);
+    //    bottom.set(x, y);
+    // Add stuff to debuger
+    de.add("bottom ", bottom);
     ellipse(bottom.x, bottom.y, 30, 30);
-    top.set(bottom.x + this.width, bottom.y - this.height);
+    float topX = bottom.x() + this.width;
+    float topY = bottom.y() - this.height; 
+    top = new Vec2D(topX, topY);
+    //    top = new Vec2D(bottom.x() + this.width, bottom.y() - this.height);
+    //    top.set(bottom.x + this.width, bottom.y - this.height);
+    de.add("top ", top);
+    fill(100, 10, 10);
     ellipse(top.x, top.y, 25, 25);
+    fill(0);
 
     // is Player p distance to the bottom of stairs 
     // less than 10 pixels and is the Player p holding down 'w' 
-    if ( bottom.distanceTo(p) < 10 && p.keyHandle.isKeyDown('W') )
+    if ( bottom.distanceTo(p) < 30 && p.keyHandle.isKeyDown('W') )
     {
-
       pushStyle();
       fill(34, 46, 200);
       rectMode(CENTER);
-      rect(top.x, top.y, 100, 100);
+      rect(top.x, top.y, 50, 50);
+      println(getClass().getName(), "Going up stairs");
       popStyle();
-      print("Going up stairs. \n");
 
+      de.add("setting path top ", top);
       // Set Path for Player to follow
-      path.setPath(bottom, top);
+      path.setDimensions(bottom, top);
       isClimbing = true;
     }
 
     if (isClimbing)
     {
-      if ( top.distanceTo(p) > 10 )
-      {
-        p.followPath(path);
-      }
+      p.followPath(path);
+//      if ( top.distanceTo(p) > 10 )
+//      {
+//        p.followPath(path);
+//      }
     }
 
     if ( top.distanceTo(p) < 10 && p.keyHandle.isKeyDown('S') )

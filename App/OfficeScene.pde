@@ -8,24 +8,18 @@ public class OfficeScene extends GamePlayScene
   CheapOfficeFurniture deskTwo;
   Door doorOne;
   Staircase stairsOne;
-  
 
   private OfficeScene()
   {
-    
-    // Create Staircase for Scene
-    stairsOne = new Staircase( new Vec2D( width - 140, 0  )) ;
+    // Create Staircase for Scene // Vec2D( width - 150, 0  )
+    stairsOne = new Staircase( new Vec2D( 150, 0  )) ;
     nodes.add(stairsOne);
-
-    // Add Path for PlayerOne to fallow upstairs
-
     doorOne = new Door( new Vec2D( width - 50, 100 )) ;
     nodes.add(doorOne);
 
-
     // Create players for Scene 
     players = new ArrayList<Player>();
-    playerOne = new PlayerOne(new Vec2D( 100, height - 250)) ;
+    playerOne = new PlayerOne(new Vec2D( 100, height - 120)) ;
     players.add(playerOne);
     // add Players to global Scene nodes arrayList
     nodes.add(playerOne);
@@ -54,10 +48,6 @@ public class OfficeScene extends GamePlayScene
       stairsOne.GoUp(p);
       doorOne.Enter(p);
     }
-
   }
-  
-
 }
-
 

@@ -19,6 +19,7 @@ public abstract class Node extends VerletParticle2D
   ArrayList<VerletParticle2D> particles;
   boolean debug = true;
   float lifespan;
+  VerletPhysics2D physics;
   Node (Vec2D loc) 
   {
     super(loc);
@@ -26,11 +27,10 @@ public abstract class Node extends VerletParticle2D
     maxSpeed = 1.0;
     maxForce = 1.0;
     acceleration = new Vec2D(0, 0);
-    velocity = new Vec2D(maxSpeed, 0);
+    velocity =  new Vec2D(maxSpeed, 0) ;
     springs = new ArrayList<VerletSpring2D>();
     particles = new ArrayList<VerletParticle2D>();
   }
-
 
   void transferSprings( ArrayList<VerletSpring2D> s_ )
   {
@@ -83,15 +83,16 @@ public abstract class Node extends VerletParticle2D
       n.normalize();
 
       // Difference of velocities so that we think of one object as stationary
-      Vec2D u = velocity.sub(other.velocity);
+      velocity = getVelocity();
+      Vec2D u = velocity.sub( other.getVelocity() );
 
       // Separate out components -- one in direction of normal
       Vec2D un = componentVector(u, n);
       // Other component
       u.sub(un);
       // These are the new velocities plus the velocity of the object we consider as stastionary
-      velocity = u.add(other.velocity);
-      other.velocity = un.add(other.velocity);
+      addVelocity( u.add(other.getVelocity()) );
+      other.addVelocity( un.add(other.getVelocity()) );
     } else if (d > sumR) 
     {
       colliding = false;
@@ -129,83 +130,57 @@ public abstract class Node extends VerletParticle2D
   // http://www.red3d.com/cwr/steer/PathFollow.html
   void followPath(Path p) {
 
+    println("p.pointList", p.pointList);
+
     // Predict location 50 (arbitrary choice) frames ahead
     // This could be based on speed 
+
+    println("getVelocity()", getVelocity());
     Vec2D predict = getVelocity();
+    println("predict", predict);
     predict.normalize();
     predict.scale(50);
-    Vec2D predictLoc = add(predict);
+    Vec2D predictLoc =  add(predict);
+    de.add("predictLoc", predictLoc);
+    println("predictLoc", predictLoc);
 
+    //    noLoop();
     // Now we must find the normal to the path from the predicted location
     // We look at the normal for each line segment and pick out the closest one
 
-    Vec2D normal = p.start;
-    Vec2D target = p.end;
-    float worldRecord = 1000000;  // Start with a very high record distance that can easily be beaten
+    Vec2D normal = p.getStart();
+    Vec2D target = p.getEnd();
+    de.add("target", target);
+    
+     seek(target);
+    float worldRecord = 10;  // Start with a very high record distance that can easily be beaten
 
-    // Loop through all points of the path
-    for (int i = 0; i < p.points.size ()-1; i++) {
 
-      // Look at a line segment
-      Vec2D a = p.points.get(i);
-      Vec2D b = p.points.get(i+1);
-
-      // Get the normal point to that line
-      Vec2D normalPoint = getNormalPoint(predictLoc, a, b);
-      // This only works because we know our path goes from left to right
-      // We could have a more sophisticated test to tell if the point is in the line segment or not
-      if (normalPoint.x < a.x || normalPoint.x > b.x) {
-        // This is something of a hacky solution, but if it's not within the line segment
-        // consider the normal to just be the end of the line segment (point b)
-        // TODO consider using getNormalizedTo(float len)
-        //   http://toxiclibs.org/docs/core/      
-        normalPoint.set(b.x(), b.y());
-      }
-
-      // How far away are we from the path?
-      float distance = predictLoc.distanceTo(normalPoint);
-      // Did we beat the record and find the closest line segment?
-      if (distance < worldRecord) {
-        worldRecord = distance;
-        // If so the target we want to steer towards is the normal
-        normal = normalPoint;
-
-        // Look at the direction of the line segment so we can seek a little bit ahead of the normal
-        Vec2D dir = b.sub(a);
-        dir.normalize();
-        // This is an oversimplification
-        // Should be based on distance to path & velocity
-        dir.scale(10);
-        target.set( normalPoint.x(), normalPoint.y() );
-        target.add(dir);
-      }
-    }
 
     // Only if the distance is greater than the path's radius do we bother to steer
     if (worldRecord > p.radius) {
       seek(target);
     }
 
-
     // Draw the debugging stuff
-        if (debug) {
-         // Draw predicted future location
-          stroke(0);
-          fill(0);
-          line(x(), y(), predictLoc.x(), predictLoc.y());
-          ellipse(predictLoc.x(), predictLoc.y(), 4, 4);
-    
-          // Draw normal location
-          stroke(0);
-          fill(0);
-         ellipse(normal.x, normal.y, 4, 4);
-         // Draw actual target (red if steering towards it)
-          line(predictLoc.x, predictLoc.y, normal.x, normal.y);
-          if (worldRecord > p.radius) fill(255, 0, 0);
-          noStroke();
-          ellipse(target.x, target.y, 8, 8);
-        }
-  }
+    if (de.on == true) {
+      // Draw predicted future location
+      stroke(0);
+      fill(0);
+      line(x(), y(), predictLoc.x(), predictLoc.y());
+      ellipse(predictLoc.x(), predictLoc.y(), 4, 4);
+
+      // Draw normal location
+      stroke(0);
+      fill(0);
+      ellipse(normal.x, normal.y, 4, 4);
+      // Draw actual target (red if steering towards it)
+      line(predictLoc.x, predictLoc.y, normal.x, normal.y);
+      if (worldRecord > p.radius) fill(255, 0, 0);
+      noStroke();
+      ellipse(target.x, target.y, 18, 8);
+    }
+  } // ! end of followPath(Path p)
 
   // A function to get the normal point from a point (p) to a line segment (a-b)
   // This function could be optimized to make fewer new Vector objects
@@ -234,13 +209,13 @@ public abstract class Node extends VerletParticle2D
     desired.normalize();
     desired.scale(maxSpeed);
     // Steering = Desired minus Velocity
-    Vec2D steer = desired.sub(velocity);
+    Vec2D steer = desired.sub(getVelocity());
     steer.limit(maxForce);  // Limit to maximum steering force
 
       addForce(steer);
   }
-  
-   // Is the particle still useful?
+
+  // Is the particle still useful?
   boolean isDead() {
     if (lifespan < 0.0) {
       return true;

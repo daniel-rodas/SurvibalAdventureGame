@@ -12,7 +12,7 @@ abstract public class Player extends Node
   Player (Vec2D loc)
   {
     super(loc);
-    
+
     // TODO Handle user Srpite for user for Player type
     //    setStates();
     // KeypressHandle helper class
@@ -29,16 +29,18 @@ abstract public class Player extends Node
    */
   public void addImpulse(float _ix, float _iy) 
   {
-    print("addImpulse \n");
+    // add item to debuger
+//    de.add("addImpulse ", "x : "+_ix+" y : "+_iy );
+
     // utilVec is a general purpose property from Node class
     // utilVec is initialized in the Player constructor
     //    utilVec.set(_ix, _iy);
     //    this.addForce(utilVec);
 
     velocity.set(_ix, _iy);
-    this.addForce(velocity);
-    this.addVelocity(velocity);
-    //    for (
+    addForce(velocity);
+    addVelocity(velocity);
+
   }
 
   public void hit() 
@@ -67,6 +69,5 @@ abstract public class Player extends Node
       addImpulse(0.1, 0);
     }
   }
-
 }
 

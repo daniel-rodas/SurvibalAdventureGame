@@ -4,18 +4,20 @@ abstract public class CheapOfficeFurniture extends OfficeNode
   {
     super(loc);
   }
-    public void TurnOn() {
-    }
+  
+  public void TurnOn() {
+  }
 
-    public void TurnOff() {
-    }
+  public void TurnOff() {
+  }
 
-    public void Break() {
-    }
+  public void Break() {
+  }
 
-    public void Throw() {
-    }
+  public void Throw() {
+  }
 
-    public void Smoke() {
-    }
+  public void Smoke() {
+  }
 }
+
