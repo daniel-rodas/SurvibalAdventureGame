@@ -21,41 +21,14 @@ class Path extends ParticlePath2D
 
   void setDimensions(Vec2D start_, Vec2D end_)
   {
-    println("end_",end_);
-    de.add("end_(initial)", end_);
-    de.add("path.getPointList()", getPointList());
-    println("path.getPointList()", getPointList());
-    de.add("path.pointList.size()", pointList.size());
-    de.add("path.pointList", pointList);
-    de.add("path.getPointList()2", getPointList());
-    
-
-    Integer pointListSize = pointList.size();
-        println("pointListSize",pointListSize);
-
-    de.add("end_0", end_);
-    //    pointList.set(0, start_);
-    if ( pointListSize.equals(0)  )
-    {
-      VerletParticle2D s = new VerletParticle2D( start_.copy() );
-      VerletParticle2D e = new VerletParticle2D( end_.copy() );
-      de.add("s (initial)", s);
-      de.add("e (initial)", e);
-      s.lock();
-      e.lock();
-      de.add("s (before_add)", s);
-      de.add("e (before_add)", e);
-      de.add("end_1", end_);
-      pointList.add(s);
-      //      pointList.add(start_);
-      de.add("end_2", end_);
-      //      pointList.add(end_);
-      pointList.add(e);
-      s.unlock();
-      e.unlock();
-    }
-
-    //    pointList.set(pointList.size()-1, end_);
+    pointList.add(start_);
+    pointList.add(end_);
+//    Integer pointListSize = pointList.size();
+//    if ( pointListSize.equals(0)  )
+//    {
+//      pointList.add(start_);
+//      pointList.add(end_);
+//    }
   }
 
   void setDimensions(Vec2D start_, Vec2D end_, float radius_)

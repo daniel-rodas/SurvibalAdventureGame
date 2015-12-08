@@ -5,13 +5,18 @@ public class PlayerOne extends Player
     super(loc);
     radius = 8;
   }
+
   void display () 
   {
+    de.add("PlayerOne.force", ( (force != null) ? force : "No force"));
+    de.add("PlayerOne.constraints", ( (constraints != null) ? constraints : "No constraints"));
+    de.add("PlayerOne.constraints.size()", ( (constraints != null) ? constraints.size() : "No constraints"));
+
+    // behaviors
+    de.add("PlayerOne.behaviors", ( (behaviors != null) ? behaviors : "No behaviors"));
+    de.add("PlayerOne.behaviors.size()", ( (behaviors != null) ? behaviors.size() : "No behaviors"));
     if (keyPressed)
     {
-      // Add stuff to debuger
-      //      de.add("Player.display(), key: " , key);
-      //      de.add("keyCode: " , keyCode);
       handleInput();
     }
     pushStyle();

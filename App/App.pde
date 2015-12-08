@@ -3,12 +3,16 @@ import toxi.processing.*;
 import toxi.physics2d.*;
 import toxi.physics2d.behaviors.*;
 import toxi.physics2d.constraints.RectConstraint;
+import toxi.physics2d.constraints.AngularConstraint;
+import toxi.physics2d.constraints.AxisConstraint;
+import toxi.physics2d.constraints.MaxConstraint;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 ToxiclibsSupport gfx;
 OfficeScene office;
 Debug de;
@@ -21,7 +25,6 @@ void setup ()
   // OfficeScene is the first level
   office = new OfficeScene();
   gfx = new ToxiclibsSupport(this);
-
   de = new Debug(true);
 }
 
@@ -32,17 +35,6 @@ void draw ()
   office.update ();
   // method comes from OfficeScene parent class Scene
   office.display();
-
-
-  Vec2D v1 = new Vec2D(mouseX, mouseY);
-  Vec2D v2 = new Vec2D(width/2, height/2);
-  fill(0);
-  de.add("v1 mag ", v1.magnitude());
-  v1.subSelf(v2);
-
-  // add item to debuger
-  de.add("v1 mag ", v1.magnitude());
-  // debuger
   de.display();
 }
 
@@ -82,7 +74,6 @@ class Debug
       text ( me.getKey() + ": " + me.getValue(), 420, lineSpacing  );
       lineSpacing += 40;
     }
-
     popStyle();
   }
 

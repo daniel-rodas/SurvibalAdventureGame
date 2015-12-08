@@ -5,6 +5,7 @@ public class PlayerTwo extends Player
     super(loc);
     radius = 10;
   }
+  
   void display () 
   {
     fill (0, 0, 127);

@@ -2,7 +2,7 @@ public class Victim extends Player
 {
   private float pain;
 
-  Victim(Vec2D loc) 
+  Victim(Vec2D loc)
   {
     super(loc);
   }
@@ -13,7 +13,7 @@ public class Victim extends Player
     rect(x, y, 25, 45);
   }
 
-  public void CryForHelp() 
+  public void CryForHelp()
   {
   }
 }

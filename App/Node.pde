@@ -7,8 +7,10 @@ public abstract class Node extends VerletParticle2D
   Vec2D utilVec;
   float width;
   float height;
+  // Utility Vec2D object to track velocity durring calculations.
   Vec2D velocity;
   Vec2D acceleration;
+  
   // Every Node object has a State object,
   // Depending on the State that Node will have different behaviors available
   // The active state for this actor (with associated sprite)
@@ -19,7 +21,8 @@ public abstract class Node extends VerletParticle2D
   ArrayList<VerletParticle2D> particles;
   boolean debug = true;
   float lifespan;
-  VerletPhysics2D physics;
+//  VerletPhysics2D physics;
+  
   Node (Vec2D loc) 
   {
     super(loc);
@@ -48,10 +51,6 @@ public abstract class Node extends VerletParticle2D
     }
   }
 
-  // Method to update location
-  //  void update() {
-  //    this.addSelf(velocity);
-  //  }
 
   // Main "run" function
   public void run() {
@@ -128,63 +127,25 @@ public abstract class Node extends VerletParticle2D
 
   // This function implements Craig Reynolds' path following algorithm
   // http://www.red3d.com/cwr/steer/PathFollow.html
-  void followPath(Path p) {
-
-    println("p.pointList", p.pointList);
-
+  void followPath(Path p) 
+  {
     // Predict location 50 (arbitrary choice) frames ahead
     // This could be based on speed 
-
-    println("getVelocity()", getVelocity());
     Vec2D predict = getVelocity();
-    println("predict", predict);
     predict.normalize();
     predict.scale(50);
     Vec2D predictLoc =  add(predict);
-    de.add("predictLoc", predictLoc);
-    println("predictLoc", predictLoc);
-
-    //    noLoop();
     // Now we must find the normal to the path from the predicted location
     // We look at the normal for each line segment and pick out the closest one
-
     Vec2D normal = p.getStart();
     Vec2D target = p.getEnd();
-    de.add("target", target);
-    
-     seek(target);
-    float worldRecord = 10;  // Start with a very high record distance that can easily be beaten
-
-
-
-    // Only if the distance is greater than the path's radius do we bother to steer
-    if (worldRecord > p.radius) {
-      seek(target);
-    }
-
-    // Draw the debugging stuff
-    if (de.on == true) {
-      // Draw predicted future location
-      stroke(0);
-      fill(0);
-      line(x(), y(), predictLoc.x(), predictLoc.y());
-      ellipse(predictLoc.x(), predictLoc.y(), 4, 4);
-
-      // Draw normal location
-      stroke(0);
-      fill(0);
-      ellipse(normal.x, normal.y, 4, 4);
-      // Draw actual target (red if steering towards it)
-      line(predictLoc.x, predictLoc.y, normal.x, normal.y);
-      if (worldRecord > p.radius) fill(255, 0, 0);
-      noStroke();
-      ellipse(target.x, target.y, 18, 8);
-    }
+    seek(target);
   } // ! end of followPath(Path p)
 
   // A function to get the normal point from a point (p) to a line segment (a-b)
   // This function could be optimized to make fewer new Vector objects
-  Vec2D getNormalPoint( Vec2D p, Vec2D a, Vec2D b) {
+  Vec2D getNormalPoint( Vec2D p, Vec2D a, Vec2D b) 
+  {
     // Vector from a to p
     Vec2D ap = p.sub(a);
     // Vector from a to b
@@ -198,7 +159,8 @@ public abstract class Node extends VerletParticle2D
 
   // A method that calculates and applies a steering force towards a target
   // STEER = DESIRED MINUS VELOCITY
-  void seek(Vec2D target) {
+  void seek(Vec2D target) 
+  {
     Vec2D desired = target.sub(this);  // A vector pointing from the location to the target
 
     // If the magnitude of desired equals 0, skip out of here
@@ -208,11 +170,11 @@ public abstract class Node extends VerletParticle2D
     // Normalize desired and scale to maximum speed
     desired.normalize();
     desired.scale(maxSpeed);
+    
     // Steering = Desired minus Velocity
     Vec2D steer = desired.sub(getVelocity());
     steer.limit(maxForce);  // Limit to maximum steering force
-
-      addForce(steer);
+    addForce(steer);
   }
 
   // Is the particle still useful?

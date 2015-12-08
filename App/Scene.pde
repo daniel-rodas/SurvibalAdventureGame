@@ -2,20 +2,20 @@ public abstract class Scene
 {
   public ArrayList<Node> nodes;
   public ArrayList<VerletSpring2D> springs;
-  public ArrayList<Node> layers;
+  public ArrayList<Scene> layers;
   // toxi.geom.Rect to represent World Bounds
   protected Rect bounds;
-  float bounce = 1.0;
 
   // Verlet physics world
   protected VerletPhysics2D physics;
+  GravityBehavior gravity;
   protected Scene()
   {
     nodes = new ArrayList<Node>();
     springs = new ArrayList<VerletSpring2D>();
-
     physics = new VerletPhysics2D ();
-    physics.addBehavior(new GravityBehavior(new Vec2D(0, 0.41)));
+    gravity = new GravityBehavior(new Vec2D(0, 0.41));
+    physics.addBehavior(gravity);
     physics.setWorldBounds(new Rect(0, 0, width, height - 100));
   }
 
@@ -46,26 +46,20 @@ public abstract class Scene
 
   public void display()
   {
-
     //    Display world bounds
     bounds = physics.getWorldBounds();
-    fill(128);
+    fill(118, 126, 112);
     rect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+
     // Display all node objects, Players, OfficeFurniture, Door, Stairs, etc.
     for ( Node n : nodes )
     {
-      n.applyConstraints();
-      n.display();
-      n.update();
+      standOnPlatform(n);
+      n.run();
+      println(n.getForce());
     }
   }
-
-
-  // use for bounce aftere collition 
-  void invert()
-  {
-  }
-
 
   public SceneLayer addSceneLayer(SceneLayer l) 
   {
@@ -80,6 +74,35 @@ public abstract class Scene
   public Node addInteractor(Node n) 
   {
     throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  void standOnPlatform(Node currentNode)
+  {
+//    de.add("currentNode.contraints", ( (currentNode.contraints != null) ? currentNode.contraints : "No currentNode.contraints" ) );
+    if ( currentNode.getClass() != Platform.class )
+    {
+      for ( Node platform_ : nodes )
+      {
+        if ( platform_.getClass() == Platform.class )
+        {
+          if ( (currentNode.y < platform_.y) && ( currentNode.x > platform_.x ) 
+            && ( currentNode.x < platform_.x + platform_.width ) )
+          {
+            if (currentNode.constraints != null) {
+//              currentNode.removeAllConstraints() ;
+            }
+
+            currentNode.update();
+            de.add("currentNode", currentNode);
+            de.add("platform_", platform_);
+            currentNode.addConstraint( new MaxConstraint( Vec2D.Axis.Y, platform_.y ));
+            currentNode.applyConstraints() ;
+          } else if (currentNode.constraints != null) {
+//            currentNode.removeAllConstraints() ;
+          }
+        }
+      }
+    }
   }
 
   public void cleanUp() 

@@ -4,6 +4,7 @@ class Desk extends CheapOfficeFurniture
   {
     super(loc);
   }
+    
   void display()
   {
     fill(255, 180, 20);

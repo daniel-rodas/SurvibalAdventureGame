@@ -1,10 +1,7 @@
 abstract public class Player extends Node 
 {
   public KeypressHandle keyHandle;
-
   int timesPressed = 0;
-
-
   int REST_LENGTH=20;
   float STRENGTH=0.125;
   float INNER_STRENGTH = 0.13;
@@ -17,11 +14,6 @@ abstract public class Player extends Node
     //    setStates();
     // KeypressHandle helper class
     keyHandle = new KeypressHandle(this);
-
-    keyHandle.handleKey('W');
-    keyHandle.handleKey('A');
-    keyHandle.handleKey('S');
-    keyHandle.handleKey('D');
   }
 
   /**
@@ -29,18 +21,9 @@ abstract public class Player extends Node
    */
   public void addImpulse(float _ix, float _iy) 
   {
-    // add item to debuger
-//    de.add("addImpulse ", "x : "+_ix+" y : "+_iy );
-
-    // utilVec is a general purpose property from Node class
-    // utilVec is initialized in the Player constructor
-    //    utilVec.set(_ix, _iy);
-    //    this.addForce(utilVec);
-
     velocity.set(_ix, _iy);
     addForce(velocity);
     addVelocity(velocity);
-
   }
 
   public void hit() 
