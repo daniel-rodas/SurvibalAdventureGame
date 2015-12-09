@@ -1,6 +1,6 @@
 public abstract class Node extends VerletParticle2D 
 {
-  float radius;
+  //  float radius;
   float maxForce;
   float maxSpeed;
   // General purpose utilVecy for making calculations at run time.
@@ -10,7 +10,7 @@ public abstract class Node extends VerletParticle2D
   // Utility Vec2D object to track velocity durring calculations.
   Vec2D velocity;
   Vec2D acceleration;
-  
+
   // Every Node object has a State object,
   // Depending on the State that Node will have different behaviors available
   // The active state for this actor (with associated sprite)
@@ -21,18 +21,34 @@ public abstract class Node extends VerletParticle2D
   ArrayList<VerletParticle2D> particles;
   boolean debug = true;
   float lifespan;
-//  VerletPhysics2D physics;
-  
+
+  // BreakingCircles
+  // https://amnonp5.wordpress.com/2011/04/23/working-with-toxiclibs/
+  ArrayList <BreakCircle> circles = new ArrayList <BreakCircle> ();
+  //  VerletPhysics2D physics;
+  //  ToxiclibsSupport gfx;
+  FloatRange radius;
+  //  Vec2D origin, mouse;
+
+  int maxCircles = 90; // maximum amount of circles on the screen
+  //  int numPoints = 50;  // number of voronoi points / segments
+  //  int minSpeed = 2;    // minimum speed of a voronoi segment
+  //  int maxSpeed = 14;   // maximum speed of a voronoi segment
+  MaxConstraint maxConstraint;
   Node (Vec2D loc) 
   {
     super(loc);
-    radius = 4.0;
+    //    radius = 4.0;
     maxSpeed = 1.0;
     maxForce = 1.0;
     acceleration = new Vec2D(0, 0);
     velocity =  new Vec2D(maxSpeed, 0) ;
     springs = new ArrayList<VerletSpring2D>();
     particles = new ArrayList<VerletParticle2D>();
+
+    radius = new BiasedFloatRange(30, 100, 30, 0.6f);
+    origin = new Vec2D(width/2, height/2);
+    resetCircles();
   }
 
   void transferSprings( ArrayList<VerletSpring2D> s_ )
@@ -69,34 +85,34 @@ public abstract class Node extends VerletParticle2D
   }
 
 
-  void collideEqualMass(Node other) {
-    float d = distanceTo(other);
-    float sumR = radius + other.radius;
-    // Are they colliding?
-    if (!colliding && d < sumR) 
-    {
-      // Yes, make new velocities!
-      colliding = true;
-      // Direction of one object another
-      Vec2D n = other.sub(this);
-      n.normalize();
-
-      // Difference of velocities so that we think of one object as stationary
-      velocity = getVelocity();
-      Vec2D u = velocity.sub( other.getVelocity() );
-
-      // Separate out components -- one in direction of normal
-      Vec2D un = componentVector(u, n);
-      // Other component
-      u.sub(un);
-      // These are the new velocities plus the velocity of the object we consider as stastionary
-      addVelocity( u.add(other.getVelocity()) );
-      other.addVelocity( un.add(other.getVelocity()) );
-    } else if (d > sumR) 
-    {
-      colliding = false;
-    }
-  }
+  //  void collideEqualMass(Node other) {
+  //    float d = distanceTo(other);
+  //    float sumR = radius + other.radius;
+  //    // Are they colliding?
+  //    if (!colliding && d < sumR) 
+  //    {
+  //      // Yes, make new velocities!
+  //      colliding = true;
+  //      // Direction of one object another
+  //      Vec2D n = other.sub(this);
+  //      n.normalize();
+  //
+  //      // Difference of velocities so that we think of one object as stationary
+  //      velocity = getVelocity();
+  //      Vec2D u = velocity.sub( other.getVelocity() );
+  //
+  //      // Separate out components -- one in direction of normal
+  //      Vec2D un = componentVector(u, n);
+  //      // Other component
+  //      u.sub(un);
+  //      // These are the new velocities plus the velocity of the object we consider as stastionary
+  //      addVelocity( u.add(other.getVelocity()) );
+  //      other.addVelocity( un.add(other.getVelocity()) );
+  //    } else if (d > sumR) 
+  //    {
+  //      colliding = false;
+  //    }
+  //  }
 
   Vec2D componentVector ( Vec2D vector, Vec2D directionVector) 
   {
@@ -170,7 +186,7 @@ public abstract class Node extends VerletParticle2D
     // Normalize desired and scale to maximum speed
     desired.normalize();
     desired.scale(maxSpeed);
-    
+
     // Steering = Desired minus Velocity
     Vec2D steer = desired.sub(getVelocity());
     steer.limit(maxForce);  // Limit to maximum steering force
@@ -184,6 +200,49 @@ public abstract class Node extends VerletParticle2D
     } else {
       return false;
     }
+  }
+
+  void drawCircles() {
+    removeAddCircles();
+    //    background(255, 0, 0);
+    //    physics.update();
+
+    mouse = new Vec2D(mouseX, mouseY);
+    for (BreakCircle bc : circles) {
+      bc.run();
+    }
+  }
+
+  void removeAddCircles() {
+    for (int i=circles.size ()-1; i>=0; i--) {
+      // if a circle is invisible, remove it...
+      if (circles.get(i).transparency < 0) {
+        circles.remove(i);
+        // and add two new circles (if there are less than maxCircles)
+        if (circles.size() < maxCircles) {
+          circles.add(new BreakCircle(origin, radius.pickRandom()));
+          circles.add(new BreakCircle(origin, radius.pickRandom()));
+        }
+      }
+    }
+  }
+
+  void keyPressed() {
+    if (key == ' ') { 
+      resetCircles();
+    }
+  }
+
+  void resetCircles() {
+    // remove all physics elements
+    for (BreakCircle bc : circles) {
+      physics.removeParticle(bc.vp);
+      physics.removeBehavior(bc.abh);
+    }
+    // remove all circles
+    circles.clear();
+    // add one circle of radius 200 at the origin
+    circles.add(new BreakCircle(origin, 200));
   }
 }
 

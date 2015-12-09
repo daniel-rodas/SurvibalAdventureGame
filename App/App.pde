@@ -1,4 +1,5 @@
 import toxi.geom.*;
+import toxi.geom.mesh2d.*;
 import toxi.processing.*;
 import toxi.physics2d.*;
 import toxi.physics2d.behaviors.*;
@@ -6,6 +7,7 @@ import toxi.physics2d.constraints.RectConstraint;
 import toxi.physics2d.constraints.AngularConstraint;
 import toxi.physics2d.constraints.AxisConstraint;
 import toxi.physics2d.constraints.MaxConstraint;
+import toxi.util.datatypes.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
@@ -15,13 +17,25 @@ import java.util.Set;
 
 ToxiclibsSupport gfx;
 OfficeScene office;
+// Verlet physics world
+//VerletPhysics2D physics;
+Vec2D origin, mouse;
 Debug de;
+
+// Verlet physics world
+VerletPhysics2D physics;
+GravityBehavior gravity;
+
 void setup () 
 {
   // for debugger make screen twice as wide
   size (1080, 860, P2D);
   //  size (540, 460, P2D)
   textSize(16);
+  physics = new VerletPhysics2D ();
+  gravity = new GravityBehavior(new Vec2D(0, 0.41));
+  physics.addBehavior(gravity);
+
   // OfficeScene is the first level
   office = new OfficeScene();
   gfx = new ToxiclibsSupport(this);
@@ -47,7 +61,7 @@ class Debug
   {
     on = true;
   }
-  
+
   Debug( boolean on )
   {
     init(on);

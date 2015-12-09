@@ -1,5 +1,6 @@
-public class OfficeScene extends GamePlayScene 
+public class HallwayScene extends GamePlayScene 
 {
+
   // office nodes will have shake behavior
   ArrayList<OfficeNode> officeNodes;
   CheapOfficeFurniture deskOne;
@@ -10,7 +11,7 @@ public class OfficeScene extends GamePlayScene
   Platform platformOne;
   Platform platformTwo;
 
-  private OfficeScene()
+  HallwayScene()
   {
     // Create Staircase for Scene // Vec2D( width - 150, 0  )
     stairsOne = new Staircase( new Vec2D( 150, 0  )) ;
@@ -45,15 +46,15 @@ public class OfficeScene extends GamePlayScene
 
     // Create Platform for for top of staircase
     platformOne = new Platform(new Vec2D( 290, 635 ));
-    platformOne.width = 100;
+    platformOne.width = width / 2;
     platformOne.height = 40;
-    platforms.add(platformOne);
+    nodes.add(platformOne);
 
     // Create Platform for for top of staircase
     platformTwo = new Platform(new Vec2D( width - 200, 135 ));
-    platformTwo.width = 180;
+    platformTwo.width = width / 4;
     platformTwo.height = 40;
-    platforms.add(platformTwo);
+    nodes.add(platformTwo);
 
     addNodesToWorld();
     addSpringsToWorld();
