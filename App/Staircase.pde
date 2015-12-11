@@ -9,13 +9,14 @@ public class Staircase extends Node
   Staircase (Vec2D loc) 
   {
     super(loc);
+    myColor = color(92, 154, 165);
     isClimbing = false;
     bottom = new Vec2D();
     top = new Vec2D();
     path = new Path();
     s = createShape();
     s.beginShape();
-    s.fill(0, 0, 255);
+    s.fill(myColor);
     s.noStroke();
     s.vertex(  0, 140);
     s.vertex(  0, 130);
@@ -97,15 +98,13 @@ public class Staircase extends Node
       }
     }
   }
-  
+
   public void display()
   {
-    de.add("bottom", bottom);
-    de.add("isGoingDown", isGoingDown);
-    de.add("isClimbing", isClimbing);
-    setBottomAndTop(x, y, bottom.x() + this.width, bottom.y() - this.height);
-    fill(31, 107, 178);
+    setBottomAndTop(x(), y(), bottom.x() + this.width, bottom.y() - this.height - 1);
+    fill(myColor);
     shape(s, x, y - this.height);
   }
+
 }
 

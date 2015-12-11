@@ -1,11 +1,11 @@
-public abstract class GamePlayScene extends Scene 
+class GamePlayScene extends Scene 
 {
-  ArrayList<Player> players;
+  ArrayList<Player> players = new ArrayList<Player>();
   Player playerOne;
   Player playerTwo;
   ArrayList<Platform> platforms = new ArrayList<Platform>();
 
-  public void display()
+  void display()
   {
     //    Display world bounds
     bounds = physics.getWorldBounds();
@@ -15,14 +15,34 @@ public abstract class GamePlayScene extends Scene
     // Display all node objects, Players, OfficeFurniture, Door, Stairs, etc.
     for ( Node n : nodes )
     {
-      for ( Platform pl : platforms )
+      if (platforms !=null)
       {
-        pl.standOn(n);
-        pl.display();
+        for ( Platform pl : platforms )
+        {
+          pl.standOn(n);
+          pl.display();
+        }
       }
 
       n.run();
     }
+  }
+
+  /**
+   * Set up our states
+   */
+
+  void setStates() {
+
+    println("State", state);
+    // idling state
+    addState(new SceneState("idle"));
+
+    // running state
+    addState(new SceneState("shaking"));
+
+    // default: just stand around doing nothing
+    setCurrentState("idle");
   }
 }
 

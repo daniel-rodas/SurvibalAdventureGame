@@ -1,6 +1,7 @@
-public abstract class Node extends VerletParticle2D 
+public abstract class Node extends VerletParticle2D implements ContextInterface
 {
-  //  float radius;
+  ArrayList<VerletSpring2D> springs;
+  ArrayList<VerletParticle2D> particles;
   float maxForce;
   float maxSpeed;
   // General purpose utilVecy for making calculations at run time.
@@ -10,15 +11,12 @@ public abstract class Node extends VerletParticle2D
   // Utility Vec2D object to track velocity durring calculations.
   Vec2D velocity;
   Vec2D acceleration;
-
-  // Every Node object has a State object,
-  // Depending on the State that Node will have different behaviors available
-  // The active state for this actor (with associated sprite)
-  State state;
+  // the layer this actor is in
+  SceneLayer layer;
   // are we colliding with another Node?
   boolean colliding = false;
-  ArrayList<VerletSpring2D> springs;
-  ArrayList<VerletParticle2D> particles;
+  // should we be removed?
+  boolean remove = false;
   boolean debug = true;
   float lifespan;
 
@@ -35,6 +33,15 @@ public abstract class Node extends VerletParticle2D
   //  int minSpeed = 2;    // minimum speed of a voronoi segment
   //  int maxSpeed = 14;   // maximum speed of a voronoi segment
   MaxConstraint maxConstraint;
+  // Global node color object
+  color myColor;
+
+  // Every Node object has a State object,
+  // Depending on the State that Node will have different behaviors available
+  // The active state for this actor (with associated sprite)
+  State state = null;
+  // all states for this actor
+  HashMap<String, State> states = new HashMap<String, State>();
   Node (Vec2D loc) 
   {
     super(loc);
@@ -45,7 +52,6 @@ public abstract class Node extends VerletParticle2D
     velocity =  new Vec2D(maxSpeed, 0) ;
     springs = new ArrayList<VerletSpring2D>();
     particles = new ArrayList<VerletParticle2D>();
-
     radius = new BiasedFloatRange(30, 100, 30, 0.6f);
     origin = new Vec2D(width/2, height/2);
     resetCircles();
@@ -67,10 +73,13 @@ public abstract class Node extends VerletParticle2D
     }
   }
 
-
   // Main "run" function
   public void run() {
     update();
+    if (state != null)
+    {
+      state.run();
+    }
     display();
   }
 
@@ -83,7 +92,6 @@ public abstract class Node extends VerletParticle2D
   {
     maxForce = mf;
   }
-
 
   //  void collideEqualMass(Node other) {
   //    float d = distanceTo(other);
@@ -124,22 +132,7 @@ public abstract class Node extends VerletParticle2D
     return directionVector;
   }
 
-  public State addState(State s) 
-  {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
   abstract public void display();
-
-  public void setState( State s ) 
-  {
-    state = s;
-  }
-
-  public State getStates() 
-  {
-    return state;
-  }
 
   // This function implements Craig Reynolds' path following algorithm
   // http://www.red3d.com/cwr/steer/PathFollow.html
@@ -233,7 +226,8 @@ public abstract class Node extends VerletParticle2D
     }
   }
 
-  void resetCircles() {
+  void resetCircles() 
+  {
     // remove all physics elements
     for (BreakCircle bc : circles) {
       physics.removeParticle(bc.vp);
@@ -243,6 +237,73 @@ public abstract class Node extends VerletParticle2D
     circles.clear();
     // add one circle of radius 200 at the origin
     circles.add(new BreakCircle(origin, 200));
+  }
+
+  /**
+   * Add a state to this actor's repetoire.
+   */
+  void addState(State _state) 
+  {
+    _state.setContext(this);
+    boolean replaced = (states.get(_state.name) != null);
+    states.put(_state.name, _state);
+    if (!replaced || (replaced && _state.name == state.name)) {
+      /* is active state null ? */
+      if (state == null) { 
+        state = _state;
+      } else { 
+        swapStates(_state);
+      }
+    }
+  }
+
+  /**
+   * Swap the current state for a different one.
+   */
+  void swapStates(State tmp) 
+  {
+    // upate state to new state
+    state = tmp;
+  }
+
+  /**
+   * Set the actor's current state by name.
+   */
+  void setCurrentState(String name) {
+    State tmp = states.get(name);
+    if (state != null && tmp != state) {
+      tmp.reset();
+      swapStates(tmp);
+    } else { 
+      state = tmp;
+    }
+  }
+
+  State getState()
+  {
+    return state;
+  }
+
+  State getState(String _name)
+  {
+    return states.get(_name);
+  }
+
+  void setState( State s ) 
+  {
+    state = s;
+  }
+
+
+  /**
+   * Set up our states
+   */
+  void setStates() {
+    // idling state
+    addState(new NodeState("idle"));
+
+    // default: just stand around doing nothing
+    setCurrentState("idle");
   }
 }
 

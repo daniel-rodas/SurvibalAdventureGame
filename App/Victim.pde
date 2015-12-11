@@ -1,4 +1,4 @@
-public class Victim extends Player 
+public class Victim extends PlayerOne 
 {
   private float pain;
 
@@ -15,6 +15,8 @@ public class Victim extends Player
 
   public void CryForHelp()
   {
+    ellipse(x,y+this.height + 50, this.width , this.width);
+    text("Help me !!",x,y+this.height + 50);
   }
 }
 

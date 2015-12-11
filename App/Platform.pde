@@ -15,7 +15,6 @@ class Platform extends Node
     fill(255, 180, 20);
     rect(x, y, this.width, this.height);
     popStyle();
-    de.add("Platform", this);
   }
 
   void standOn(Node node)
@@ -25,9 +24,21 @@ class Platform extends Node
       && ( int(node.x()) <= int((this.x()) + int(this.width) )) )
     {
       node.addConstraint( this.maxConstraint );
+      node.applyConstraints();
     } else if (node.constraints != null) {
       node.removeConstraint( this.maxConstraint );
+      node.applyConstraints();
     }
+  }
+  /**
+   * Set up our states
+   */
+  void setStates() {
+    // idling state
+    addState(new NodeState("idle"));
+
+    // default: just stand around doing nothing
+    setCurrentState("idle");
   }
 }
 

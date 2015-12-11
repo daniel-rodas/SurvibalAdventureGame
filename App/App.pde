@@ -17,11 +17,12 @@ import java.util.Set;
 
 ToxiclibsSupport gfx;
 OfficeScene office;
+//HallwayScene hallway;
+Scene activeScene;
 // Verlet physics world
 //VerletPhysics2D physics;
 Vec2D origin, mouse;
 Debug de;
-
 // Verlet physics world
 VerletPhysics2D physics;
 GravityBehavior gravity;
@@ -29,34 +30,36 @@ GravityBehavior gravity;
 void setup () 
 {
   // for debugger make screen twice as wide
-  size (1080, 860, P2D);
-  //  size (540, 460, P2D)
-  textSize(16);
+//  size (1080, 860, P2D);
+  size (540, 460, P2D);
+  gfx = new ToxiclibsSupport(this);
+  de = new Debug(false);
   physics = new VerletPhysics2D ();
   gravity = new GravityBehavior(new Vec2D(0, 0.41));
   physics.addBehavior(gravity);
-
+  mouse = new Vec2D(mouseX, mouseY);
   // OfficeScene is the first level
   office = new OfficeScene();
-  gfx = new ToxiclibsSupport(this);
-  de = new Debug(true);
+  activeScene = office;
 }
 
 void draw () 
 {
-  // add item to debuger
-  de.add("mouse ", "x : "+mouseX+", y : "+mouseY );
-  office.update ();
+  activeScene.update();
   // method comes from OfficeScene parent class Scene
-  office.display();
+  activeScene.display();
+  activeScene.shakeButton();
   de.display();
+  
 }
+
 
 class Debug
 {
   // Create a hash map 
   HashMap items = new HashMap();
   boolean on = false;
+  color indicatorColor;
   Debug()
   {
     on = true;
@@ -69,26 +72,30 @@ class Debug
 
   void display()
   {
-    pushStyle();
-    fill(120, 87, 120, 70);
-    rect(390, 10, 640, height - 80);
-    int lineSpacing = 40;
-    fill(10);
-    text ( "Item Count : " + items.size(), 220, 40 );
-    fill(20, 47, 20);
-
-    // Get a set of the entries 
-    Set set = items.entrySet(); 
-    // Get an iterator 
-    Iterator i = set.iterator(); 
-    // Display elements 
-    while (i.hasNext ()) 
-    { 
-      Map.Entry me = (Map.Entry)i.next(); 
-      text ( me.getKey() + ": " + me.getValue(), 420, lineSpacing  );
-      lineSpacing += 40;
+    indicatorLight();
+    if ( on )
+    {
+      pushStyle();
+      fill(120, 87, 120, 70);
+      rect(390, 10, 640, height - 80);
+      int lineSpacing = 40;
+      fill(10);
+      text ( "Item Count : " + items.size(), 220, 40 );
+      fill(20, 47, 20);
+      textSize(16);
+      // Get a set of the entries 
+      Set set = items.entrySet(); 
+      // Get an iterator 
+      Iterator i = set.iterator(); 
+      // Display elements 
+      while (i.hasNext ()) 
+      { 
+        Map.Entry me = (Map.Entry)i.next(); 
+        text ( me.getKey() + ": " + me.getValue(), 420, lineSpacing  );
+        lineSpacing += 40;
+      }
+      popStyle();
     }
-    popStyle();
   }
 
   void add(Object name, float val)
@@ -108,7 +115,26 @@ class Debug
 
   void init()
   {
-    size();
   }
+
+  void indicatorLight()
+  {
+    String msg;
+    pushStyle();
+    if (on) {
+      indicatorColor = color(120, 240, 100);
+      msg = "Debug On";
+    } else {
+      indicatorColor = color(240, 120, 100);
+      msg = "Debug Off";
+    }
+    fill(indicatorColor);
+    ellipseMode(CENTER);
+    ellipse(10, 10, 10, 10);
+    textSize(10);
+    text(msg, 20, 14);
+    popStyle();
+  }
+ 
 }
 

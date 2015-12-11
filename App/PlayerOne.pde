@@ -9,13 +9,10 @@ public class PlayerOne extends Player
 
   void display () 
   {
-    de.add("PlayerOne.force", ( (force != null) ? force : "No force"));
-    de.add("PlayerOne.constraints", ( (constraints != null) ? constraints : "No constraints"));
-    de.add("PlayerOne.constraints.size()", ( (constraints != null) ? constraints.size() : "No constraints"));
-
-    // behaviors
-    de.add("PlayerOne.behaviors", ( (behaviors != null) ? behaviors : "No behaviors"));
-    de.add("PlayerOne.behaviors.size()", ( (behaviors != null) ? behaviors.size() : "No behaviors"));
+    State jumping = states.get("jumping");
+    de.add("jumping state from hashmap @PlayerOne.display",jumping.duration);
+    de.add("state.name@PlayerOne.display",state.name);
+    de.add("state.duration@PlayerOne.display",state.duration);
     if (keyPressed)
     {
       handleInput();
@@ -39,10 +36,6 @@ public class PlayerOne extends Player
     //      ellipse ( body.x, body.y, radius*2, radius  );
     //      ellipse ( tail.x, tail.y, radius, radius*2  );
     popStyle();
-    // Add stuff to debuger
-    de.add("playerOne loc : ", this );
-    // TODO add physics stats
-    //      de.add("playerOne STAT : ", this );
   }
 }
 
