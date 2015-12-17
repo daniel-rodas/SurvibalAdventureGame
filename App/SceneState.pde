@@ -12,7 +12,7 @@ class SceneState extends State {
   {
     if (name == "shaking")
     {
-      ContextInterface c = getContext();
+      IStateContext c = getContext();
       c.setCurrentState("idle");   
     }
     duration = 0;

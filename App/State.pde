@@ -5,7 +5,7 @@ public abstract class State
    */
 
   String name;
-  ContextInterface context;
+  IStateContext context;
   int duration = -1, 
   served = 0;
   boolean loop = false;
@@ -38,12 +38,12 @@ public abstract class State
   /**
    * bind this state to an node
    */
-  void setContext(ContextInterface _context) 
+  void setContext(IStateContext _context) 
   {
     context = _context;
   }
 
-  ContextInterface getContext() 
+  IStateContext getContext() 
   {
     return context;
   }

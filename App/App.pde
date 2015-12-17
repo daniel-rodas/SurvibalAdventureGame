@@ -1,13 +1,14 @@
-import toxi.geom.*;
-import toxi.geom.mesh2d.*;
-import toxi.processing.*;
-import toxi.physics2d.*;
-import toxi.physics2d.behaviors.*;
-import toxi.physics2d.constraints.RectConstraint;
-import toxi.physics2d.constraints.AngularConstraint;
-import toxi.physics2d.constraints.AxisConstraint;
-import toxi.physics2d.constraints.MaxConstraint;
-import toxi.util.datatypes.*;
+import shiffman.box2d.*;
+import org.jbox2d.common.*;
+import org.jbox2d.dynamics.joints.*;
+import org.jbox2d.collision.shapes.*;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.*;
+import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.contacts.*;
+import org.jbox2d.dynamics.BodyType;
+
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
@@ -15,42 +16,42 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-ToxiclibsSupport gfx;
+
 OfficeScene office;
 //HallwayScene hallway;
 Scene activeScene;
 // Verlet physics world
-//VerletPhysics2D physics;
-Vec2D origin, mouse;
+//Vec2 physics;
+Vec2 origin, mouse;
 Debug de;
-// Verlet physics world
-VerletPhysics2D physics;
-GravityBehavior gravity;
+// A reference to our box2d world
+Box2DProcessing box2d;
 
-void setup () 
+void setup() 
 {
   // for debugger make screen twice as wide
-//  size (1080, 860, P2D);
-  size (540, 460, P2D);
-  gfx = new ToxiclibsSupport(this);
-  de = new Debug(false);
-  physics = new VerletPhysics2D ();
-  gravity = new GravityBehavior(new Vec2D(0, 0.41));
-  physics.addBehavior(gravity);
-  mouse = new Vec2D(mouseX, mouseY);
-  // OfficeScene is the first level
+  size (1024, 768);
+  //  size (540, 460, P2D);
+  //  de = new Debug(true);
+  // Initialize box2d physics and create the world
+  box2d = new Box2DProcessing(this);
+  box2d.createWorld();
+  /* OfficeScene is the first level */
   office = new OfficeScene();
   activeScene = office;
 }
 
-void draw () 
+void draw() 
 {
-  activeScene.update();
+  box2d.step();
+  mouse = new Vec2(mouseX, mouseY);
+  //  de.add("mouse", mouse);
+  //  de.add("activeScene", activeScene);
+//  activeScene.update();
   // method comes from OfficeScene parent class Scene
   activeScene.display();
   activeScene.shakeButton();
-  de.display();
-  
+//  de.display();
 }
 
 
@@ -76,6 +77,7 @@ class Debug
     if ( on )
     {
       pushStyle();
+
       fill(120, 87, 120, 70);
       rect(390, 10, 640, height - 80);
       int lineSpacing = 40;
@@ -135,6 +137,5 @@ class Debug
     text(msg, 20, 14);
     popStyle();
   }
- 
 }
 

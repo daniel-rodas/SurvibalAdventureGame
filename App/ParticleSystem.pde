@@ -1,11 +1,9 @@
-// An ArrayList is used to manage the list of Particles 
-
 class ParticleSystem {
 
   ArrayList<Node> particles;    // An arraylist for all the particles
-  Vec2D origin;        // An origin point for where particles are birthed
+  Vec2 origin;        // An origin point for where particles are birthed
 
-  ParticleSystem(int num, Vec2D v) {
+  ParticleSystem(int num, Vec2 v) {
     particles = new ArrayList<Node>();   // Initialize the arraylist
     origin.set(v);                        // Store the origin point
     for (int i = 0; i < num; i++) {
@@ -14,7 +12,7 @@ class ParticleSystem {
   }
 
   void run() {
-    for (int i = particles.size()-1; i >= 0; i--) {
+    for (int i = particles.size ()-1; i >= 0; i--) {
       Node p = particles.get(i);
       p.run();
       if (p.isDead()) {
@@ -31,9 +29,9 @@ class ParticleSystem {
   boolean dead() {
     if (particles.isEmpty()) {
       return true;
-    } 
-    else {
+    } else {
       return false;
     }
   }
 }
+

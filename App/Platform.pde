@@ -1,35 +1,24 @@
 class Platform extends Node
 {
-  GravityBehavior platformGravity;
-
-  Platform (Vec2D loc)
+  Platform (Vec2 loc)
   {
     super(loc);
-    maxConstraint = new MaxConstraint( Vec2D.Axis.Y, y );    
-    addConstraint( maxConstraint );
+    this.width = 250;
+    this.height = 40;
   }
 
   void display()
   {
     pushStyle();
     fill(255, 180, 20);
-    rect(x, y, this.width, this.height);
+//    rect(x, y, this.width, this.height);
     popStyle();
   }
 
   void standOn(Node node)
-  {    
-    if ( ( int(node.y()) <= int(this.y()) ) 
-      && ( int(node.x()) >= int(this.x()) ) 
-      && ( int(node.x()) <= int((this.x()) + int(this.width) )) )
-    {
-      node.addConstraint( this.maxConstraint );
-      node.applyConstraints();
-    } else if (node.constraints != null) {
-      node.removeConstraint( this.maxConstraint );
-      node.applyConstraints();
-    }
+  {
   }
+
   /**
    * Set up our states
    */
@@ -39,6 +28,35 @@ class Platform extends Node
 
     // default: just stand around doing nothing
     setCurrentState("idle");
+  }
+
+  /* TODO create body stuff */
+  void createFixture() 
+  {
+  }
+  void makeShape() 
+  {
+  }
+  void createJoint() 
+  {
+  }
+  void cleanup()
+  {
+    // Let's find the screen position of the particle
+    Vec2 pos = box2d.getBodyPixelCoord(body);
+    // Is it off the bottom of the screen?
+    if (pos.y > height+radius*2) 
+    {
+      destroy();
+    }
+  }
+  
+  /* Platforms should have a STATIC body */
+  protected void defineBody()
+  {
+    // Define a body
+    bodyDefinition = new BodyDef();
+    bodyDefinition.type = BodyType.STATIC; 
   }
 }
 

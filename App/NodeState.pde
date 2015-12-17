@@ -13,7 +13,7 @@ class NodeState extends State
   {
     if (name == "jumping")
     {
-      ContextInterface c = getContext();
+      IStateContext c = getContext();
       c.setCurrentState("idle");   
     }
     duration = 0;
