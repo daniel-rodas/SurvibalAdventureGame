@@ -6,6 +6,7 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.*;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.BodyType;
 
 
@@ -36,106 +37,52 @@ void setup()
   // Initialize box2d physics and create the world
   box2d = new Box2DProcessing(this);
   box2d.createWorld();
+  // Turn on collision listening!
+  box2d.listenForCollisions();
   /* OfficeScene is the first level */
   office = new OfficeScene();
   activeScene = office;
+
+  de = new Debug();
 }
 
 void draw() 
 {
-  box2d.step();
   mouse = new Vec2(mouseX, mouseY);
   //  de.add("mouse", mouse);
   //  de.add("activeScene", activeScene);
-//  activeScene.update();
+  activeScene.update();
   // method comes from OfficeScene parent class Scene
   activeScene.display();
   activeScene.shakeButton();
-//  de.display();
+  de.display();
 }
 
 
-class Debug
+// Collision event functions!
+public void beginContact(Contact cp)
 {
-  // Create a hash map 
-  HashMap items = new HashMap();
-  boolean on = false;
-  color indicatorColor;
-  Debug()
-  {
-    on = true;
+  // Get both fixtures
+  Fixture f1 = cp.getFixtureA();
+  Fixture f2 = cp.getFixtureB();
+  // Get both bodies
+  Body b1 = f1.getBody();
+  Body b2 = f2.getBody();
+
+  // Get our objects that reference these bodies
+  Object o1 = b1.getUserData();
+  Object o2 = b2.getUserData();
+
+  if (o1.getClass() == Node.class && o2.getClass() == Node.class) {
+    Node p1 = (Node) o1;
+    p1.change();
+    Node p2 = (Node) o2;
+    p2.change();
   }
+}
 
-  Debug( boolean on )
-  {
-    init(on);
-  } 
-
-  void display()
-  {
-    indicatorLight();
-    if ( on )
-    {
-      pushStyle();
-
-      fill(120, 87, 120, 70);
-      rect(390, 10, 640, height - 80);
-      int lineSpacing = 40;
-      fill(10);
-      text ( "Item Count : " + items.size(), 220, 40 );
-      fill(20, 47, 20);
-      textSize(16);
-      // Get a set of the entries 
-      Set set = items.entrySet(); 
-      // Get an iterator 
-      Iterator i = set.iterator(); 
-      // Display elements 
-      while (i.hasNext ()) 
-      { 
-        Map.Entry me = (Map.Entry)i.next(); 
-        text ( me.getKey() + ": " + me.getValue(), 420, lineSpacing  );
-        lineSpacing += 40;
-      }
-      popStyle();
-    }
-  }
-
-  void add(Object name, float val)
-  {
-    items.put(name, val);
-  }
-
-  void add(Object name, Object val)
-  {
-    items.put(name, val);
-  }
-
-  void init(boolean debug)
-  {
-    on = debug;
-  }
-
-  void init()
-  {
-  }
-
-  void indicatorLight()
-  {
-    String msg;
-    pushStyle();
-    if (on) {
-      indicatorColor = color(120, 240, 100);
-      msg = "Debug On";
-    } else {
-      indicatorColor = color(240, 120, 100);
-      msg = "Debug Off";
-    }
-    fill(indicatorColor);
-    ellipseMode(CENTER);
-    ellipse(10, 10, 10, 10);
-    textSize(10);
-    text(msg, 20, 14);
-    popStyle();
-  }
+// Objects stop touching each other
+void endContact(Contact cp) 
+{
 }
 

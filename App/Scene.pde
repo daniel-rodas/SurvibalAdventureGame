@@ -15,10 +15,10 @@ public abstract class Scene implements IStateContext
   Player playerTwo;
 
   public void update()
-  {  
+  { 
     // We must always step through time!
     box2d.step();
-    shaking = false;
+    shaking = true;
     shakeButton();
   }
 
@@ -30,7 +30,7 @@ public abstract class Scene implements IStateContext
       rotate(0);
       c = color(240, 100, 100);
     } else {
-      rotate(random(-0.5,0.5));
+      rotate(random(-0.003,0.00062));
       c = color(140, 200, 100);
     }
     fill(c);

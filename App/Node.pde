@@ -19,19 +19,24 @@ public abstract class Node extends Vec2 implements IStateContext
   State state = null;
   /* all states for this actor */
   HashMap<String, State> states = new HashMap<String, State>();
-
   // Box2D physics body
   Body body;
   BodyDef bodyDefinition;
+  FixtureDef fixtureDefinition;
   /* Utility vector for grabing position */
   Vec2 position;
-  Vec2 startP;
+  Scene curentScene;
+  Scene destination;
+  PolygonShape polygonShape;
+  CircleShape circleShape;
 
   Node (Vec2 loc) 
   {
     super(loc);
+    curentScene = activeScene; 
     /* Start body configuration and creation */
     setupBody(this);
+    body.setUserData(this);
   }
 
 
@@ -159,31 +164,31 @@ public abstract class Node extends Vec2 implements IStateContext
     createJoint();
   }
 
-  /* 1. overide this method if you want to set a body type */
+  /* Step 1. overide this method if you want to set a body type */
   protected void defineBody()
   {
     // Define a body
     bodyDefinition = new BodyDef();
+    bodyDefinition.position = box2d.coordPixelsToWorld(x, y);
     bodyDefinition.type = BodyType.DYNAMIC;
     println("Step 1");
   }
 
-  /* 2. Core elements of a box2d body */
+  /* Step 2. Core elements of a box2d body */
   protected void createBody( Vec2 center )
   {
     // Set its position
     bodyDefinition.position.set( box2d.coordPixelsToWorld( center ) );
     body = box2d.createBody(bodyDefinition);
-    //     body = box2d.world.createBody(bodyDefinition);
     println("Step 2");
   }
 
   /* Concrete elements of a box2d body for derived node classes */
-  /* 3. define shape for body */
+  /* Step 3. define shape for body */
   abstract protected void makeShape();
-  /* 4. define and create fixture */
+  /* Step 4. define and create fixture */
   abstract protected void createFixture();
-  /* 5.create joins */
+  /* Step 5.create joins */
   abstract protected void createJoint();
 
   // This function removes the particle from the box2d world
@@ -193,5 +198,17 @@ public abstract class Node extends Vec2 implements IStateContext
   }
 
   abstract void cleanup();
+
+  void applyForce(Vec2 force)
+  {
+    Vec2 pos = body.getWorldCenter();
+    body.applyForce(force, pos);
+  }
+
+  void change()
+  {
+    print(this, " Colliding");
+  }
+
 }
 

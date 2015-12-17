@@ -2,7 +2,8 @@ abstract class GamePlayScene extends Scene
 {
   /* A list we'll use to track fixed objects */
   ArrayList<Boundary> boundaries = new ArrayList<Boundary>();
-  ArrayList<Platform> platforms = new ArrayList<Platform>();
+  ArrayList<Staircase> stairs = new ArrayList<Staircase>();
+  ArrayList<Door> doors = new ArrayList<Door>();
   ArrayList<OfficeNode> officeNodes;
   color backgroundColor = color(70 , 83, 135);
   GamePlayScene()
@@ -10,7 +11,8 @@ abstract class GamePlayScene extends Scene
     playerOne = new PlayerOne(new Vec2( width/4, height - 100 )) ;
     addPlayer(playerOne);
     setupBoundaries();
-    println("player.body.getPosition()",playerOne.body.getPosition());
+    setupStaircaces();
+    setupDoors();
   }
 
   /**
@@ -32,6 +34,8 @@ abstract class GamePlayScene extends Scene
   {
     setBackground();
     displayBoundaries();
+    displayStaircases();
+    displayDoors();
     displayNodes();
   }
 
@@ -43,7 +47,7 @@ abstract class GamePlayScene extends Scene
   void setupBoundaries()
   {
     /* Add a bunch of fixed boundaries */
-    boundaries.add(new Boundary(width/4, height-5, width/2-50, 10));
+    boundaries.add(new Boundary(width/4, height-5, width/2-50, 10));  
     boundaries.add(new Boundary(3*width/4, height-5, width/2-50, 10));
     boundaries.add(new Boundary(width-5, height/2, 10, height));
     boundaries.add(new Boundary(5, height/2, 10, height));
@@ -65,5 +69,33 @@ abstract class GamePlayScene extends Scene
       n.run();
     }
   }
+  
+  void setupStaircaces()
+  {
+    stairs.add(new Staircase(new Vec2(width-100, height/2)));
+  }
+
+  void displayStaircases()
+  {
+    // Display all the boundaries
+    for (Staircase s : stairs) {
+      s.display();
+    }
+  }
+ 
+  void setupDoors()
+  {
+    doors.add(new Door(new Vec2(width-300, height - 20)));
+    doors.add(new Door(new Vec2(width-30, height - 220)));
+  }
+
+  void displayDoors()
+  {
+    // Display all the boundaries
+    for (Door d : doors) {
+      d.display();
+    }
+  }
+ 
 }
 

@@ -10,29 +10,22 @@ public class PlayerOne extends Player
 
   void display() 
   {
+    de.add(getClass()+" Linear Velocity",body.getLinearVelocity());
     if (keyPressed)
     {
-      
       handleInput();
     }
-
     // We look at each body and get its screen position
-    Vec2 rtt = box2d.getBodyPixelCoord(body);
-//    position.set( box2d.getBodyPixelCoord(body) );
-//    de.add("PlayerOne body p",p);
-//    de.add("PlayerOne myColor",myColor);
+    position = box2d.getBodyPixelCoord(body);
     // Get its angle of rotation
     float a = body.getAngle();
     rectMode(CENTER);
     pushMatrix();
-    translate(rtt.x, rtt.y);
-//    rotate(a);
+    translate(position.x, position.y);
     fill(myColor);
     stroke(0);
     strokeWeight(1);
     ellipse(0, 0, radius*2, radius*2);
-    // Let's add a line so we can see the rotation
-//    line(position.x, position.x, radius, 0);
     popMatrix();
   }
 }

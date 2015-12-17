@@ -2,9 +2,7 @@ abstract public class Player  extends Node
 {
   public KeypressHandle keyHandle;
   int timesPressed = 0;
-  CircleShape circleShape;
-  FixtureDef fixtureDefinition;
-
+  
   Player (Vec2 loc)
   {
     super(loc);    
@@ -22,7 +20,7 @@ abstract public class Player  extends Node
    */
   public void addImpulse(float _ix, float _iy) 
   {
-    body.setLinearVelocity( new Vec2(_ix, _iy) );
+    applyForce( new Vec2(_ix, _iy) );
   }
 
   // handle key presses
@@ -37,10 +35,9 @@ abstract public class Player  extends Node
       //           if ( force.y < 0.5 && force.y > -0.5  )
       //       {
       // W key (Jump) moves player up by reducing the value of the x coordinants 
-//      addImpulse(0, 10);
-      body.setLinearVelocity( new Vec2(0, 10) );
-      body.setAngularDamping( 0.9 );
       body.setLinearDamping( 2 );
+      addImpulse(0, 800);
+      body.setAngularDamping( 0.9 );
       setCurrentState("jumping");
       state.setDuration(60 * 1.5);
       //       }
@@ -49,13 +46,13 @@ abstract public class Player  extends Node
     if (keyHandle.isKeyDown('A')) 
     { 
       // A key moves player (walk) left by reducing the value of the x coordinant 
-      addImpulse(-10, 0);
+      addImpulse(-20, 0);
     }
 
     if (keyHandle.isKeyDown('D')) 
     { 
       // D key moves player (walk) right by incresing the value of the x coordinant 
-      addImpulse(10, 0);
+      addImpulse(30, 0);
     }
   }
 
@@ -89,9 +86,10 @@ abstract public class Player  extends Node
     // default: just stand around doing nothing
     setCurrentState("idle");
   }
+  
+  /* Step 1 Parent has it */
 
   /* Step 2 Parent has it */
-
 
   /* Step 3 */
   void makeShape() 
@@ -111,6 +109,7 @@ abstract public class Player  extends Node
     fixtureDefinition.friction = 0.3;
     fixtureDefinition.restitution = 0.5;
     body.createFixture(fixtureDefinition);
+//    body.setUserData(this);
     println("Step 4 in Player");
   }
   void createJoint() 

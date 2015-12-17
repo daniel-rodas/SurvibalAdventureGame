@@ -26,5 +26,13 @@ public class OfficeScene extends GamePlayScene
   {
     super.display();
   }
+  
+  void setupBoundaries()
+  {
+    super.setupBoundaries();
+    /* Add a bunch of fixed boundaries */
+    boundaries.add(new Platform(width, height-115, width/2-50, 20));
+    boundaries.add(new Platform(100, height-35, 150, 30));
+  }
 }
 
