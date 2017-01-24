@@ -1,6 +1,9 @@
 Dependencies:
 
-Install Box2D for Processing
+Install Processing on your computer from: 
+https://processing.org/download/
+
+Next, install the Box2D library for Processing
 
 1.a Sketch -> Import Library... -> Add Library... 
 
