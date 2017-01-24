@@ -1,36 +1,65 @@
-public abstract class Node extends VerletParticle2D 
+public abstract class Node extends VerletParticle2D implements ContextInterface
 {
-  float radius;
+  ArrayList<VerletSpring2D> springs;
+  ArrayList<VerletParticle2D> particles;
   float maxForce;
   float maxSpeed;
   // General purpose utilVecy for making calculations at run time.
   Vec2D utilVec;
   float width;
   float height;
+  // Utility Vec2D object to track velocity durring calculations.
   Vec2D velocity;
   Vec2D acceleration;
+  // the layer this actor is in
+  SceneLayer layer;
+  // are we colliding with another Node?
+  boolean colliding = false;
+  // should we be removed?
+  boolean remove = false;
+  boolean debug = true;
+  float lifespan;
+<<<<<<< HEAD
+  VerletPhysics2D physics;
+=======
+
+  // BreakingCircles
+  // https://amnonp5.wordpress.com/2011/04/23/working-with-toxiclibs/
+  ArrayList <BreakCircle> circles = new ArrayList <BreakCircle> ();
+  //  VerletPhysics2D physics;
+  //  ToxiclibsSupport gfx;
+  FloatRange radius;
+  //  Vec2D origin, mouse;
+
+  int maxCircles = 90; // maximum amount of circles on the screen
+  //  int numPoints = 50;  // number of voronoi points / segments
+  //  int minSpeed = 2;    // minimum speed of a voronoi segment
+  //  int maxSpeed = 14;   // maximum speed of a voronoi segment
+  MaxConstraint maxConstraint;
+  // Global node color object
+  color myColor;
+
   // Every Node object has a State object,
   // Depending on the State that Node will have different behaviors available
   // The active state for this actor (with associated sprite)
-  State state;
-  // are we colliding with another Node?
-  boolean colliding = false;
-  ArrayList<VerletSpring2D> springs;
-  ArrayList<VerletParticle2D> particles;
-  boolean debug = true;
-  float lifespan;
+  State state = null;
+  // all states for this actor
+  HashMap<String, State> states = new HashMap<String, State>();
+>>>>>>> origin/master
   Node (Vec2D loc) 
   {
     super(loc);
-    radius = 4.0;
+    //    radius = 4.0;
     maxSpeed = 1.0;
     maxForce = 1.0;
     acceleration = new Vec2D(0, 0);
-    velocity = new Vec2D(maxSpeed, 0);
+    velocity =  new Vec2D(maxSpeed, 0) ;
     springs = new ArrayList<VerletSpring2D>();
     particles = new ArrayList<VerletParticle2D>();
+    radius = new BiasedFloatRange(30, 100, 30, 0.6f);
+    origin = new Vec2D(width/2, height/2);
+    resetCircles();
   }
-
 
   void transferSprings( ArrayList<VerletSpring2D> s_ )
   {
@@ -48,14 +77,13 @@ public abstract class Node extends VerletParticle2D
     }
   }
 
-  // Method to update location
-  //  void update() {
-  //    this.addSelf(velocity);
-  //  }
-
   // Main "run" function
   public void run() {
     update();
+    if (state != null)
+    {
+      state.run();
+    }
     display();
   }
 
@@ -69,34 +97,34 @@ public abstract class Node extends VerletParticle2D
     maxForce = mf;
   }
 
-
-  void collideEqualMass(Node other) {
-    float d = distanceTo(other);
-    float sumR = radius + other.radius;
-    // Are they colliding?
-    if (!colliding && d < sumR) 
-    {
-      // Yes, make new velocities!
-      colliding = true;
-      // Direction of one object another
-      Vec2D n = other.sub(this);
-      n.normalize();
-
-      // Difference of velocities so that we think of one object as stationary
-      Vec2D u = velocity.sub(other.velocity);
-
-      // Separate out components -- one in direction of normal
-      Vec2D un = componentVector(u, n);
-      // Other component
-      u.sub(un);
-      // These are the new velocities plus the velocity of the object we consider as stastionary
-      velocity = u.add(other.velocity);
-      other.velocity = un.add(other.velocity);
-    } else if (d > sumR) 
-    {
-      colliding = false;
-    }
-  }
+  //  void collideEqualMass(Node other) {
+  //    float d = distanceTo(other);
+  //    float sumR = radius + other.radius;
+  //    // Are they colliding?
+  //    if (!colliding && d < sumR) 
+  //    {
+  //      // Yes, make new velocities!
+  //      colliding = true;
+  //      // Direction of one object another
+  //      Vec2D n = other.sub(this);
+  //      n.normalize();
+  //
+  //      // Difference of velocities so that we think of one object as stationary
+  //      velocity = getVelocity();
+  //      Vec2D u = velocity.sub( other.getVelocity() );
+  //
+  //      // Separate out components -- one in direction of normal
+  //      Vec2D un = componentVector(u, n);
+  //      // Other component
+  //      u.sub(un);
+  //      // These are the new velocities plus the velocity of the object we consider as stastionary
+  //      addVelocity( u.add(other.getVelocity()) );
+  //      other.addVelocity( un.add(other.getVelocity()) );
+  //    } else if (d > sumR) 
+  //    {
+  //      colliding = false;
+  //    }
+  //  }
 
   Vec2D componentVector ( Vec2D vector, Vec2D directionVector) 
   {
@@ -108,47 +136,32 @@ public abstract class Node extends VerletParticle2D
     return directionVector;
   }
 
-  public State addState(State s) 
-  {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
   abstract public void display();
-
-  public void setState( State s ) 
-  {
-    state = s;
-  }
-
-  public State getStates() 
-  {
-    return state;
-  }
 
   // This function implements Craig Reynolds' path following algorithm
   // http://www.red3d.com/cwr/steer/PathFollow.html
-  void followPath(Path p) {
-
+  void followPath(Path p) 
+  {
     // Predict location 50 (arbitrary choice) frames ahead
     // This could be based on speed 
     Vec2D predict = getVelocity();
     predict.normalize();
     predict.scale(50);
-    Vec2D predictLoc = add(predict);
-
+    Vec2D predictLoc =  add(predict);
     // Now we must find the normal to the path from the predicted location
     // We look at the normal for each line segment and pick out the closest one
+<<<<<<< HEAD
 
-    Vec2D normal = p.start;
-    Vec2D target = p.end;
+    Vec2D normal = p.getStart();
+    Vec2D target = p.getEnd();
     float worldRecord = 1000000;  // Start with a very high record distance that can easily be beaten
 
     // Loop through all points of the path
-    for (int i = 0; i < p.points.size ()-1; i++) {
+    for (int i = 0; i < p.pointList.size ()-1; i++) {
 
       // Look at a line segment
-      Vec2D a = p.points.get(i);
-      Vec2D b = p.points.get(i+1);
+      Vec2D a = p.pointList.get(i);
+      Vec2D b = p.pointList.get(i+1);
 
       // Get the normal point to that line
       Vec2D normalPoint = getNormalPoint(predictLoc, a, b);
@@ -206,10 +219,17 @@ public abstract class Node extends VerletParticle2D
           ellipse(target.x, target.y, 8, 8);
         }
   }
+=======
+    Vec2D normal = p.getStart();
+    Vec2D target = p.getEnd();
+    seek(target);
+  } // ! end of followPath(Path p)
+>>>>>>> origin/master
 
   // A function to get the normal point from a point (p) to a line segment (a-b)
   // This function could be optimized to make fewer new Vector objects
-  Vec2D getNormalPoint( Vec2D p, Vec2D a, Vec2D b) {
+  Vec2D getNormalPoint( Vec2D p, Vec2D a, Vec2D b) 
+  {
     // Vector from a to p
     Vec2D ap = p.sub(a);
     // Vector from a to b
@@ -223,7 +243,8 @@ public abstract class Node extends VerletParticle2D
 
   // A method that calculates and applies a steering force towards a target
   // STEER = DESIRED MINUS VELOCITY
-  void seek(Vec2D target) {
+  void seek(Vec2D target) 
+  {
     Vec2D desired = target.sub(this);  // A vector pointing from the location to the target
 
     // If the magnitude of desired equals 0, skip out of here
@@ -233,20 +254,131 @@ public abstract class Node extends VerletParticle2D
     // Normalize desired and scale to maximum speed
     desired.normalize();
     desired.scale(maxSpeed);
-    // Steering = Desired minus Velocity
-    Vec2D steer = desired.sub(velocity);
-    steer.limit(maxForce);  // Limit to maximum steering force
 
-      addForce(steer);
+    // Steering = Desired minus Velocity
+    Vec2D steer = desired.sub(getVelocity());
+    steer.limit(maxForce);  // Limit to maximum steering force
+    addForce(steer);
   }
-  
-   // Is the particle still useful?
+
+  // Is the particle still useful?
   boolean isDead() {
     if (lifespan < 0.0) {
       return true;
     } else {
       return false;
     }
+  }
+
+  void drawCircles() {
+    removeAddCircles();
+    //    background(255, 0, 0);
+    //    physics.update();
+
+    mouse = new Vec2D(mouseX, mouseY);
+    for (BreakCircle bc : circles) {
+      bc.run();
+    }
+  }
+
+  void removeAddCircles() {
+    for (int i=circles.size ()-1; i>=0; i--) {
+      // if a circle is invisible, remove it...
+      if (circles.get(i).transparency < 0) {
+        circles.remove(i);
+        // and add two new circles (if there are less than maxCircles)
+        if (circles.size() < maxCircles) {
+          circles.add(new BreakCircle(origin, radius.pickRandom()));
+          circles.add(new BreakCircle(origin, radius.pickRandom()));
+        }
+      }
+    }
+  }
+
+  void keyPressed() {
+    if (key == ' ') { 
+      resetCircles();
+    }
+  }
+
+  void resetCircles() 
+  {
+    // remove all physics elements
+    for (BreakCircle bc : circles) {
+      physics.removeParticle(bc.vp);
+      physics.removeBehavior(bc.abh);
+    }
+    // remove all circles
+    circles.clear();
+    // add one circle of radius 200 at the origin
+    circles.add(new BreakCircle(origin, 200));
+  }
+
+  /**
+   * Add a state to this actor's repetoire.
+   */
+  void addState(State _state) 
+  {
+    _state.setContext(this);
+    boolean replaced = (states.get(_state.name) != null);
+    states.put(_state.name, _state);
+    if (!replaced || (replaced && _state.name == state.name)) {
+      /* is active state null ? */
+      if (state == null) { 
+        state = _state;
+      } else { 
+        swapStates(_state);
+      }
+    }
+  }
+
+  /**
+   * Swap the current state for a different one.
+   */
+  void swapStates(State tmp) 
+  {
+    // upate state to new state
+    state = tmp;
+  }
+
+  /**
+   * Set the actor's current state by name.
+   */
+  void setCurrentState(String name) {
+    State tmp = states.get(name);
+    if (state != null && tmp != state) {
+      tmp.reset();
+      swapStates(tmp);
+    } else { 
+      state = tmp;
+    }
+  }
+
+  State getState()
+  {
+    return state;
+  }
+
+  State getState(String _name)
+  {
+    return states.get(_name);
+  }
+
+  void setState( State s ) 
+  {
+    state = s;
+  }
+
+
+  /**
+   * Set up our states
+   */
+  void setStates() {
+    // idling state
+    addState(new NodeState("idle"));
+
+    // default: just stand around doing nothing
+    setCurrentState("idle");
   }
 }
 

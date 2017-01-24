@@ -1,31 +1,36 @@
 public class Door extends OfficeNode 
 {
+  color myColor = color(135, 138, 165);
   Door (Vec2D loc)
   {
     super(loc);
+    this.width = 30;
+    this.height = 80;
   }
 
-  public boolean Enter(Player p) 
+  boolean Enter(Player p) 
   {
     // bottom is a Vec2D to help detect the distance between the foot of the Stairs and the Player
 
-    if ( this.distanceTo(p) < 15 && p.keyHandle.isKeyDown('W') )
+    if ( this.distanceTo(p) < 30 && p.keyHandle.isKeyDown('W') )
     {
-      fill(34, 46, 200);
-      rect(100, 100, 45, 36);
+      myColor = color(104, 53, 0);
       return true;
     }
+    myColor = color(135, 138, 165);
     return false;
   }
 
-  public Node Leave(Node n) {
+  Node Leave(Node n) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
   public void display()
   {
-    fill(0);
-    rect(x, y - 80, 30, 80);
+    pushStyle();
+    fill(myColor);
+    rect(x, y - 80, this.width, this.height);
+    popStyle();
   }
 }
 

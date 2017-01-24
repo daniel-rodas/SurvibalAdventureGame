@@ -5,16 +5,18 @@ public class Staircase extends Node
   Vec2D top;
   Path path;
   boolean isClimbing;
+  boolean isGoingDown;
   Staircase (Vec2D loc) 
   {
     super(loc);
+    myColor = color(92, 154, 165);
     isClimbing = false;
     bottom = new Vec2D();
     top = new Vec2D();
     path = new Path();
     s = createShape();
     s.beginShape();
-    s.fill(0, 0, 255);
+    s.fill(myColor);
     s.noStroke();
     s.vertex(  0, 140);
     s.vertex(  0, 130);
@@ -52,55 +54,101 @@ public class Staircase extends Node
     this.height = 140;
   }
 
-  public void GoUp(Player p) 
+  void setBottomAndTop( float bX, float bY, float tX, float tY)
   {
+    bottom.set(bX, bY);
+    top.set(tX, tY);
+  }
 
+<<<<<<< HEAD
     // bottom is a Vec2D to help detect the distance between the foot of the Stairs and the Player
     fill(245, 245, 250, 0.4);
     bottom.set(x, y);
     ellipse(bottom.x, bottom.y, 30, 30);
     top.set(bottom.x + this.width, bottom.y - this.height);
     ellipse(top.x, top.y, 25, 25);
-
+      fill(0);
+      // Add stuff to debuger
+      de.add("bottom : " , bottom);
+      de.add("top : " , top);
+=======
+  public void GoUp(Player p) 
+  {
+>>>>>>> origin/master
     // is Player p distance to the bottom of stairs 
-    // less than 10 pixels and is the Player p holding down 'w' 
-    if ( bottom.distanceTo(p) < 10 && p.keyHandle.isKeyDown('W') )
+    // less than 30 pixels and is the Player p holding down 'w' 
+    if ( bottom.distanceTo(p) < 30 && p.keyHandle.isKeyDown('W') )
     {
+<<<<<<< HEAD
 
       pushStyle();
       fill(34, 46, 200);
       rectMode(CENTER);
       rect(top.x, top.y, 100, 100);
-      popStyle();
       print("Going up stairs. \n");
+      
+      popStyle();
 
+=======
+>>>>>>> origin/master
       // Set Path for Player to follow
-      path.setPath(bottom, top);
+      path.setDimensions(bottom, top);
       isClimbing = true;
     }
 
-    if (isClimbing)
-    {
-      if ( top.distanceTo(p) > 10 )
-      {
-        p.followPath(path);
-      }
-    }
-
-    if ( top.distanceTo(p) < 10 && p.keyHandle.isKeyDown('S') )
-    {
-      isClimbing = false;
-    }
+<<<<<<< HEAD
+    //    if (isClimbing)
+    //    {
+    //      if ( top.distanceTo(p) > 10 )
+    //      {
+    //        p.followPath(path);
+    //      }
+    //    }
+    //
+    //    if ( top.distanceTo(p) < 10 && p.keyHandle.isKeyDown('S') )
+    //    {
+    //      isClimbing = false;
+    //    }
   }
 
   public void GoDown(Node n) {
     isClimbing = true;
+=======
+    if (isClimbing)
+    {
+      p.followPath(path);
+      if ( top.distanceTo(p) < 40 && ( p.keyHandle.isKeyDown('D') || p.keyHandle.isKeyDown('S') || p.keyHandle.isKeyDown('W') ))
+      {
+        isClimbing = false;
+      }
+    }
+  }
+
+  public void GoDown(Player p) 
+  {
+    if ( top.distanceTo(p) < 30 && p.keyHandle.isKeyDown('S') )
+    {
+      // Set Path for Player to follow
+      path.setDimensions(top, bottom);
+      isGoingDown = true;
+    }
+    if (isGoingDown)
+    {
+      p.followPath(path);
+      if ( bottom.distanceTo(p) < 40 )
+      {
+        isGoingDown = false;
+      }
+    }
+>>>>>>> origin/master
   }
 
   public void display()
   {
-    fill(31, 107, 178);
+    setBottomAndTop(x(), y(), bottom.x() + this.width, bottom.y() - this.height - 1);
+    fill(myColor);
     shape(s, x, y - this.height);
   }
+
 }
 

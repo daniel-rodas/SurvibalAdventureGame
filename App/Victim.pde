@@ -1,8 +1,8 @@
-public class Victim extends Player 
+public class Victim extends PlayerOne 
 {
   private float pain;
 
-  Victim(Vec2D loc) 
+  Victim(Vec2D loc)
   {
     super(loc);
   }
@@ -13,8 +13,10 @@ public class Victim extends Player
     rect(x, y, 25, 45);
   }
 
-  public void CryForHelp() 
+  public void CryForHelp()
   {
+    ellipse(x,y+this.height + 50, this.width , this.width);
+    text("Help me !!",x,y+this.height + 50);
   }
 }
 

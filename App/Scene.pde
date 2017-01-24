@@ -1,23 +1,21 @@
-public abstract class Scene 
+public abstract class Scene implements ContextInterface
 {
-  public ArrayList<Node> nodes;
-  public ArrayList<VerletSpring2D> springs;
-  public ArrayList<Node> layers;
-  // toxi.geom.Rect to represent World Bounds
-  protected Rect bounds;
-  float bounce = 1.0;
-
-  // Verlet physics world
-  protected VerletPhysics2D physics;
-  protected Scene()
+  ArrayList<Node> nodes;
+  ArrayList<VerletSpring2D> springs;
+  ArrayList<Scene> layers;
+  State state = null;
+  String name;
+  Scene active;
+  Rect bounds;
+  MaxConstraint maxConstraint;
+  // all states for this actor
+  HashMap<String, State> states = new HashMap<String, State>();
+  boolean shaking = false;
+  Scene()
   {
     nodes = new ArrayList<Node>();
     springs = new ArrayList<VerletSpring2D>();
-   
-    physics = new VerletPhysics2D ();
-    physics.addBehavior(new GravityBehavior(new Vec2D(0, 0.41)));
     physics.setWorldBounds(new Rect(0, 0, width, height - 100));
-
   }
 
   void addNodesToWorld()
@@ -30,9 +28,9 @@ public abstract class Scene
       n.transferSprings( springs );
     }
   }
- 
- void addSpringsToWorld() 
- {
+
+  void addSpringsToWorld() 
+  {
     for ( VerletSpring2D s : springs )
     {
       // Give Players physics properties
@@ -43,70 +41,27 @@ public abstract class Scene
   public void update()
   {
     physics.update();
-  }
-
-  public void display()
-  {
-
-    //    Display world bounds
-    bounds = physics.getWorldBounds();
-
-    fill(128);
-    print("bounds : "+bounds+"\n");
-    rect(bounds.x, bounds.y, bounds.width, bounds.height);
-    // Display all node objects, Players, OfficeFurniture, Door, Stairs, etc.
-    for ( Node n : nodes )
+    
+    
+    if (shaking == false)
     {
-      print("node.x "+n.x+"\n");
-
-      n.display();
-      borders(n);
+      rotate(random(-0.01, 0.01));
     }
   }
 
-  // Check for bouncing off borders
-  void borders(Node n) {
-    if (n.y > bounds.height) {
 
-      n.velocity.y *= -bounce;
-
-      //      n.lock();
-      //      n.y = height;
-      //      n.lock();
-    } else if (n.y < bounds.y) {
-
-      n.velocity.y *= -bounce;
-
-      //      n.lock();
-      //      n.y = 0;
-      //      n.unlock();
-    } 
-    if (n.x > bounds.width - 1) {
-      pushStyle();
-      fill(240, 50, 50);
-      rect(0, 0, 300, 100);
-      popStyle();
-      //      n.velocity.x *= -bounce;
-      println("Hit worldboundry. n.x " + n.x + "\n");
-
-      //      n.lock();
-      //      n.x = width;
-      //      n.unlock();
-    } else if (n.x < bounds.x) {
-
-      n.velocity.x *= -bounce;
-
-      //      n.lock();
-      //      n.x = 0;
-      //      n.unlock();
-    }
-  }  
-
-  // use for bounce aftere collition 
-  void invert()
+  void shakeButton()
   {
+    color c;
+    if ( ! shaking )
+    {
+      c = color(240, 100, 100);
+    } else {
+      c = color(140, 200, 100);
+    }
+    fill(c);
+    ellipse(50, 30, 50, 50);
   }
-
 
   public SceneLayer addSceneLayer(SceneLayer l) 
   {
@@ -123,8 +78,92 @@ public abstract class Scene
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
-  public void cleanUp() 
+  void cleanUp() 
   {
+  }
+
+  abstract void display();
+
+  /**
+   * Add a state to this actor's repetoire.
+   */
+  void addState(State _state) 
+  {
+    _state.setContext(this);
+    boolean replaced = (states.get(_state.name) != null);
+    states.put(_state.name, _state);
+    if (!replaced || (replaced && _state.name == state.name)) {
+      /* is active state null ? */
+      if (state == null) { 
+        state = _state;
+      } else { 
+        swapStates(_state);
+      }
+    }
+  }
+
+  /**
+   * Swap the current state for a different one.
+   */
+  void swapStates(State tmp) 
+  {
+    // upate state to new state
+    state = tmp;
+  }
+
+  /**
+   * Set the actor's current state by name.
+   */
+  void setCurrentState(String name) {
+    State tmp = states.get(name);
+    if (state != null && tmp != state) {
+      tmp.reset();
+      swapStates(tmp);
+    } else { 
+      state = tmp;
+    }
+  }
+
+  State getState()
+  {
+    return state;
+  }
+
+  State getState(String _name)
+  {
+    return states.get(_name);
+  }
+
+  public void setState( State s ) 
+  {
+    state = s;
+  }
+
+  // all scenes for this gameplay
+  HashMap<String, Scene> scenes = new HashMap<String, Scene>();
+
+
+  /**
+   * Add a scene to this game's repetoire.
+   */
+  void addScene(Scene _scene) 
+  {
+    scenes.put(_scene.name, _scene);
+  }
+
+  Scene getActive()
+  {
+    return active;
+  }
+
+  Scene getScene(String _name)
+  {
+    return scenes.get(_name);
+  }
+
+  public void setActive( Scene s ) 
+  {
+    active = s;
   }
 }
 
