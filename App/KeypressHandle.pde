@@ -1,6 +1,5 @@
 public class KeypressHandle
 {
-
   // ====== KEY HANDLING ======
 
   protected boolean[] locked = new boolean[256];
@@ -81,54 +80,5 @@ public class KeypressHandle
     return true;
   }
 
-
-
-  /**
-   * Does the indicated x/y coordinate fall inside this drawable thing's region?
-   */
-//  boolean over(float _x, float _y) {
-//    if (active == null) return false;
-//    return active.over(_x - getX(), _y - getY());
-//  }
-
 }
 
-
-
-
-
-
-
-
-
-
-/*
-
- public class KeypressHandle
- {
- Node node;
- State active;
- 
- KeypressHandle( Node n )
- {
- node = n;
- active = n.state;
- }
- 
- // ====== KEY HANDLING ======
- 
- // check whether a key is pressed or not
- public boolean isKeyDown(char k) 
- {
- if (keyPressed)
- {
- if ( (key == Character.toUpperCase(k)) || (key == Character.toLowerCase(k)) )
- {
- return true;
- }
- }
- return false;
- }
- }
- 
- */

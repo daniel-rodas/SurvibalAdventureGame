@@ -1,85 +1,49 @@
-public abstract class Node extends VerletParticle2D implements ContextInterface
+public abstract class Node extends Vec2 implements IStateContext
 {
-  ArrayList<VerletSpring2D> springs;
-  ArrayList<VerletParticle2D> particles;
-  float maxForce;
-  float maxSpeed;
-  // General purpose utilVecy for making calculations at run time.
-  Vec2D utilVec;
   float width;
   float height;
-  // Utility Vec2D object to track velocity durring calculations.
-  Vec2D velocity;
-  Vec2D acceleration;
-  // the layer this actor is in
-  SceneLayer layer;
-  // are we colliding with another Node?
+  /* are we colliding with another Node? */
   boolean colliding = false;
-  // should we be removed?
+  /* should we be removed? */
   boolean remove = false;
   boolean debug = true;
   float lifespan;
-<<<<<<< HEAD
-  VerletPhysics2D physics;
-=======
-
-  // BreakingCircles
-  // https://amnonp5.wordpress.com/2011/04/23/working-with-toxiclibs/
-  ArrayList <BreakCircle> circles = new ArrayList <BreakCircle> ();
-  //  VerletPhysics2D physics;
-  //  ToxiclibsSupport gfx;
-  FloatRange radius;
-  //  Vec2D origin, mouse;
-
-  int maxCircles = 90; // maximum amount of circles on the screen
-  //  int numPoints = 50;  // number of voronoi points / segments
-  //  int minSpeed = 2;    // minimum speed of a voronoi segment
-  //  int maxSpeed = 14;   // maximum speed of a voronoi segment
-  MaxConstraint maxConstraint;
-  // Global node color object
+  float radius;
+  /* Global node color object */
   color myColor;
-
-  // Every Node object has a State object,
-  // Depending on the State that Node will have different behaviors available
-  // The active state for this actor (with associated sprite)
+  /* the layer this actor is in */
+  SceneLayer layer;
+  /* Every Node object has a State object, */
+  /* Depending on the State that Node will have different behaviors available */
+  /* The active state for this actor (with associated sprite) */
   State state = null;
-  // all states for this actor
+  /* all states for this actor */
   HashMap<String, State> states = new HashMap<String, State>();
->>>>>>> origin/master
-  Node (Vec2D loc) 
+  // Box2D physics body
+  Body body;
+  BodyDef bodyDefinition;
+  FixtureDef fixtureDefinition;
+  /* Utility vector for grabing position */
+  Vec2 position;
+  Scene curentScene;
+  Scene destination;
+  PolygonShape polygonShape;
+  CircleShape circleShape;
+
+  Node (Vec2 loc) 
   {
     super(loc);
-    //    radius = 4.0;
-    maxSpeed = 1.0;
-    maxForce = 1.0;
-    acceleration = new Vec2D(0, 0);
-    velocity =  new Vec2D(maxSpeed, 0) ;
-    springs = new ArrayList<VerletSpring2D>();
-    particles = new ArrayList<VerletParticle2D>();
-    radius = new BiasedFloatRange(30, 100, 30, 0.6f);
-    origin = new Vec2D(width/2, height/2);
-    resetCircles();
+    curentScene = activeScene; 
+    /* Start body configuration and creation */
+    setupBody(this);
+    body.setUserData(this);
   }
 
-  void transferSprings( ArrayList<VerletSpring2D> s_ )
+
+  /* Main "run" function */
+  public void run() 
   {
-    for ( VerletSpring2D s : springs )
-    {
-      s_.add(s);
-    }
-  }
-
-  void addNodeParticlesToWorld( VerletPhysics2D p_ )
-  {
-    for ( VerletParticle2D p : particles )
-    {
-      p_.addParticle(p);
-    }
-  }
-
-  // Main "run" function
-  public void run() {
-    update();
+    /* TODO Update world physics */
     if (state != null)
     {
       state.run();
@@ -87,178 +51,26 @@ public abstract class Node extends VerletParticle2D implements ContextInterface
     display();
   }
 
-  public void setMaxSpeed( float ms )
-  {
-    maxSpeed = ms;
-  }
-
-  public void setMaxForce( float mf )
-  {
-    maxForce = mf;
-  }
-
-  //  void collideEqualMass(Node other) {
-  //    float d = distanceTo(other);
-  //    float sumR = radius + other.radius;
-  //    // Are they colliding?
-  //    if (!colliding && d < sumR) 
-  //    {
-  //      // Yes, make new velocities!
-  //      colliding = true;
-  //      // Direction of one object another
-  //      Vec2D n = other.sub(this);
-  //      n.normalize();
-  //
-  //      // Difference of velocities so that we think of one object as stationary
-  //      velocity = getVelocity();
-  //      Vec2D u = velocity.sub( other.getVelocity() );
-  //
-  //      // Separate out components -- one in direction of normal
-  //      Vec2D un = componentVector(u, n);
-  //      // Other component
-  //      u.sub(un);
-  //      // These are the new velocities plus the velocity of the object we consider as stastionary
-  //      addVelocity( u.add(other.getVelocity()) );
-  //      other.addVelocity( un.add(other.getVelocity()) );
-  //    } else if (d > sumR) 
-  //    {
-  //      colliding = false;
-  //    }
-  //  }
-
-  Vec2D componentVector ( Vec2D vector, Vec2D directionVector) 
-  {
-    //--! ARGUMENTS: vector, directionVector (2D vectors)
-    //--! RETURNS: the component vector of vector in the direction directionVector
-    //-- normalize directionVector
-    directionVector.normalize();
-    directionVector.scale(vector.dot(directionVector));
-    return directionVector;
-  }
-
   abstract public void display();
 
-  // This function implements Craig Reynolds' path following algorithm
-  // http://www.red3d.com/cwr/steer/PathFollow.html
+  /* This function implements Craig Reynolds' path following algorithm */
+  /* http://www.red3d.com/cwr/steer/PathFollow.html */
   void followPath(Path p) 
   {
-    // Predict location 50 (arbitrary choice) frames ahead
-    // This could be based on speed 
-    Vec2D predict = getVelocity();
-    predict.normalize();
-    predict.scale(50);
-    Vec2D predictLoc =  add(predict);
-    // Now we must find the normal to the path from the predicted location
-    // We look at the normal for each line segment and pick out the closest one
-<<<<<<< HEAD
-
-    Vec2D normal = p.getStart();
-    Vec2D target = p.getEnd();
-    float worldRecord = 1000000;  // Start with a very high record distance that can easily be beaten
-
-    // Loop through all points of the path
-    for (int i = 0; i < p.pointList.size ()-1; i++) {
-
-      // Look at a line segment
-      Vec2D a = p.pointList.get(i);
-      Vec2D b = p.pointList.get(i+1);
-
-      // Get the normal point to that line
-      Vec2D normalPoint = getNormalPoint(predictLoc, a, b);
-      // This only works because we know our path goes from left to right
-      // We could have a more sophisticated test to tell if the point is in the line segment or not
-      if (normalPoint.x < a.x || normalPoint.x > b.x) {
-        // This is something of a hacky solution, but if it's not within the line segment
-        // consider the normal to just be the end of the line segment (point b)
-        // TODO consider using getNormalizedTo(float len)
-        //   http://toxiclibs.org/docs/core/      
-        normalPoint.set(b.x(), b.y());
-      }
-
-      // How far away are we from the path?
-      float distance = predictLoc.distanceTo(normalPoint);
-      // Did we beat the record and find the closest line segment?
-      if (distance < worldRecord) {
-        worldRecord = distance;
-        // If so the target we want to steer towards is the normal
-        normal = normalPoint;
-
-        // Look at the direction of the line segment so we can seek a little bit ahead of the normal
-        Vec2D dir = b.sub(a);
-        dir.normalize();
-        // This is an oversimplification
-        // Should be based on distance to path & velocity
-        dir.scale(10);
-        target.set( normalPoint.x(), normalPoint.y() );
-        target.add(dir);
-      }
-    }
-
-    // Only if the distance is greater than the path's radius do we bother to steer
-    if (worldRecord > p.radius) {
-      seek(target);
-    }
-
-
-    // Draw the debugging stuff
-        if (debug) {
-         // Draw predicted future location
-          stroke(0);
-          fill(0);
-          line(x(), y(), predictLoc.x(), predictLoc.y());
-          ellipse(predictLoc.x(), predictLoc.y(), 4, 4);
-    
-          // Draw normal location
-          stroke(0);
-          fill(0);
-         ellipse(normal.x, normal.y, 4, 4);
-         // Draw actual target (red if steering towards it)
-          line(predictLoc.x, predictLoc.y, normal.x, normal.y);
-          if (worldRecord > p.radius) fill(255, 0, 0);
-          noStroke();
-          ellipse(target.x, target.y, 8, 8);
-        }
-  }
-=======
-    Vec2D normal = p.getStart();
-    Vec2D target = p.getEnd();
-    seek(target);
-  } // ! end of followPath(Path p)
->>>>>>> origin/master
+  } /* ! end of followPath(Path p) */
 
   // A function to get the normal point from a point (p) to a line segment (a-b)
   // This function could be optimized to make fewer new Vector objects
-  Vec2D getNormalPoint( Vec2D p, Vec2D a, Vec2D b) 
+  Vec2 getNormalPoint( Vec2 p, Vec2 a, Vec2 b) 
   {
-    // Vector from a to p
-    Vec2D ap = p.sub(a);
-    // Vector from a to b
-    Vec2D ab = b.sub(a);
-    ab.normalize(); // Normalize the line
-    // Project vector "diff" onto line by using the dot product
-    ab.scale(ap.dot(ab));
-    Vec2D normalPoint = a.add(ab);
-    return normalPoint;
+
+    return new Vec2();
   }
 
   // A method that calculates and applies a steering force towards a target
   // STEER = DESIRED MINUS VELOCITY
-  void seek(Vec2D target) 
+  void seek(Vec2 target) 
   {
-    Vec2D desired = target.sub(this);  // A vector pointing from the location to the target
-
-    // If the magnitude of desired equals 0, skip out of here
-    // (We could optimize this to check if x and y are 0 to avoid mag() square root
-    if (desired.magnitude() == 0) return;
-
-    // Normalize desired and scale to maximum speed
-    desired.normalize();
-    desired.scale(maxSpeed);
-
-    // Steering = Desired minus Velocity
-    Vec2D steer = desired.sub(getVelocity());
-    steer.limit(maxForce);  // Limit to maximum steering force
-    addForce(steer);
   }
 
   // Is the particle still useful?
@@ -268,50 +80,6 @@ public abstract class Node extends VerletParticle2D implements ContextInterface
     } else {
       return false;
     }
-  }
-
-  void drawCircles() {
-    removeAddCircles();
-    //    background(255, 0, 0);
-    //    physics.update();
-
-    mouse = new Vec2D(mouseX, mouseY);
-    for (BreakCircle bc : circles) {
-      bc.run();
-    }
-  }
-
-  void removeAddCircles() {
-    for (int i=circles.size ()-1; i>=0; i--) {
-      // if a circle is invisible, remove it...
-      if (circles.get(i).transparency < 0) {
-        circles.remove(i);
-        // and add two new circles (if there are less than maxCircles)
-        if (circles.size() < maxCircles) {
-          circles.add(new BreakCircle(origin, radius.pickRandom()));
-          circles.add(new BreakCircle(origin, radius.pickRandom()));
-        }
-      }
-    }
-  }
-
-  void keyPressed() {
-    if (key == ' ') { 
-      resetCircles();
-    }
-  }
-
-  void resetCircles() 
-  {
-    // remove all physics elements
-    for (BreakCircle bc : circles) {
-      physics.removeParticle(bc.vp);
-      physics.removeBehavior(bc.abh);
-    }
-    // remove all circles
-    circles.clear();
-    // add one circle of radius 200 at the origin
-    circles.add(new BreakCircle(origin, 200));
   }
 
   /**
@@ -369,16 +137,78 @@ public abstract class Node extends VerletParticle2D implements ContextInterface
     state = s;
   }
 
-
   /**
    * Set up our states
    */
-  void setStates() {
+  void setStates() 
+  {
     // idling state
     addState(new NodeState("idle"));
 
     // default: just stand around doing nothing
     setCurrentState("idle");
   }
+
+  /* Start body configuration and creation */
+  protected void setupBody( Vec2 loc )
+  {
+    /* 1. Define a body */
+    defineBody();
+    /* 2. Template methods for constructing PBox2D Body objects */
+    createBody( this );
+    /* 3. define shape for body */
+    makeShape();
+    /* 4. define and create fixture */
+    createFixture();
+    /* 5.create joins */
+    createJoint();
+  }
+
+  /* Step 1. overide this method if you want to set a body type */
+  protected void defineBody()
+  {
+    // Define a body
+    bodyDefinition = new BodyDef();
+    bodyDefinition.position = box2d.coordPixelsToWorld(x, y);
+    bodyDefinition.type = BodyType.DYNAMIC;
+    println("Step 1");
+  }
+
+  /* Step 2. Core elements of a box2d body */
+  protected void createBody( Vec2 center )
+  {
+    // Set its position
+    bodyDefinition.position.set( box2d.coordPixelsToWorld( center ) );
+    body = box2d.createBody(bodyDefinition);
+    println("Step 2");
+  }
+
+  /* Concrete elements of a box2d body for derived node classes */
+  /* Step 3. define shape for body */
+  abstract protected void makeShape();
+  /* Step 4. define and create fixture */
+  abstract protected void createFixture();
+  /* Step 5.create joins */
+  abstract protected void createJoint();
+
+  // This function removes the particle from the box2d world
+  void destroy() 
+  {
+    box2d.destroyBody(body);
+  }
+
+  abstract void cleanup();
+
+  void applyForce(Vec2 force)
+  {
+    Vec2 pos = body.getWorldCenter();
+    body.applyForce(force, pos);
+  }
+
+  void change()
+  {
+    print(this, " Colliding");
+  }
+
 }
 

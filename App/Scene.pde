@@ -1,62 +1,36 @@
-public abstract class Scene implements ContextInterface
+public abstract class Scene implements IStateContext
 {
-  ArrayList<Node> nodes;
-  ArrayList<VerletSpring2D> springs;
+  ArrayList<Node> nodes = new ArrayList<Node>();
   ArrayList<Scene> layers;
   State state = null;
   String name;
   Scene active;
-  Rect bounds;
-  MaxConstraint maxConstraint;
   // all states for this actor
   HashMap<String, State> states = new HashMap<String, State>();
+  // all scenes for this gameplay
+  HashMap<String, Scene> scenes = new HashMap<String, Scene>();
   boolean shaking = false;
-  Scene()
-  {
-    nodes = new ArrayList<Node>();
-    springs = new ArrayList<VerletSpring2D>();
-    physics.setWorldBounds(new Rect(0, 0, width, height - 100));
-  }
-
-  void addNodesToWorld()
-  {
-    for ( Node n : nodes )
-    {
-      // Give Players physics properties
-      physics.addParticle(n);
-      n.addNodeParticlesToWorld( physics );
-      n.transferSprings( springs );
-    }
-  }
-
-  void addSpringsToWorld() 
-  {
-    for ( VerletSpring2D s : springs )
-    {
-      // Give Players physics properties
-      physics.addSpring(s);
-    }
-  }
+  ArrayList<Player> players = new ArrayList<Player>();
+  Player playerOne;
+  Player playerTwo;
 
   public void update()
-  {
-    physics.update();
-    
-    
-    if (shaking == false)
-    {
-      rotate(random(-0.01, 0.01));
-    }
+  { 
+    // We must always step through time!
+    box2d.step();
+    shaking = true;
+    shakeButton();
   }
-
 
   void shakeButton()
   {
     color c;
     if ( ! shaking )
     {
+      rotate(0);
       c = color(240, 100, 100);
     } else {
+      rotate(random(-0.003,0.00062));
       c = color(140, 200, 100);
     }
     fill(c);
@@ -68,9 +42,10 @@ public abstract class Scene implements ContextInterface
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
-  public Player addPlayer(Player p) 
+  void addPlayer( Player p )
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    players.add(p);
+    nodes.add(p);
   }
 
   public Node addInteractor(Node n) 
@@ -124,6 +99,10 @@ public abstract class Scene implements ContextInterface
     }
   }
 
+  /*
+   * implements IStateContext;
+   */
+
   State getState()
   {
     return state;
@@ -138,10 +117,6 @@ public abstract class Scene implements ContextInterface
   {
     state = s;
   }
-
-  // all scenes for this gameplay
-  HashMap<String, Scene> scenes = new HashMap<String, Scene>();
-
 
   /**
    * Add a scene to this game's repetoire.
@@ -165,5 +140,7 @@ public abstract class Scene implements ContextInterface
   {
     active = s;
   }
+  
+  abstract void setBackground();
 }
 

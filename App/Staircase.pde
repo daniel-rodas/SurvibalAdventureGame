@@ -1,57 +1,23 @@
 public class Staircase extends Node 
 {
   PShape s;  // The PShape object
-  Vec2D bottom;
-  Vec2D top;
-  Path path;
+  Vec2 bottom;
+  Vec2 top;
   boolean isClimbing;
   boolean isGoingDown;
-  Staircase (Vec2D loc) 
+  ArrayList<Vec2> steps;
+  ChainShape chain;
+  Staircase(Vec2 loc) 
   {
     super(loc);
     myColor = color(92, 154, 165);
     isClimbing = false;
-    bottom = new Vec2D();
-    top = new Vec2D();
-    path = new Path();
-    s = createShape();
-    s.beginShape();
-    s.fill(myColor);
-    s.noStroke();
-    s.vertex(  0, 140);
-    s.vertex(  0, 130);
-    s.vertex( 10, 130);
-    s.vertex( 10, 120);
-    s.vertex( 20, 120);
-    s.vertex( 20, 110);
-    s.vertex( 30, 110);
-    s.vertex( 30, 100);
-    s.vertex( 40, 100);
-    s.vertex( 40, 90);
-    s.vertex( 50, 90);
-    s.vertex( 50, 80);
-    s.vertex( 60, 80);
-    s.vertex( 60, 70);
-    s.vertex( 70, 70);
-    s.vertex( 70, 60);
-    s.vertex( 80, 60);
-    s.vertex( 80, 50);
-    s.vertex( 90, 50);
-    s.vertex( 90, 40);
-    s.vertex(100, 40);
-    s.vertex(100, 30);
-    s.vertex(110, 30);
-    s.vertex(110, 20);
-    s.vertex(120, 20);
-    s.vertex(120, 10);
-    s.vertex(130, 10);
-    s.vertex(130, 0);
-    s.vertex(140, 0);
-    s.vertex(140, 0);
-    s.vertex(140, 140);
-    s.endShape();
+    bottom = new Vec2();
+    top = new Vec2();
+
     this.width = 140;
     this.height = 140;
+    println(this, "Constructor");
   }
 
   void setBottomAndTop( float bX, float bY, float tX, float tY)
@@ -60,95 +26,107 @@ public class Staircase extends Node
     top.set(tX, tY);
   }
 
-<<<<<<< HEAD
-    // bottom is a Vec2D to help detect the distance between the foot of the Stairs and the Player
-    fill(245, 245, 250, 0.4);
-    bottom.set(x, y);
-    ellipse(bottom.x, bottom.y, 30, 30);
-    top.set(bottom.x + this.width, bottom.y - this.height);
-    ellipse(top.x, top.y, 25, 25);
-      fill(0);
-      // Add stuff to debuger
-      de.add("bottom : " , bottom);
-      de.add("top : " , top);
-=======
   public void GoUp(Player p) 
   {
->>>>>>> origin/master
-    // is Player p distance to the bottom of stairs 
-    // less than 30 pixels and is the Player p holding down 'w' 
-    if ( bottom.distanceTo(p) < 30 && p.keyHandle.isKeyDown('W') )
-    {
-<<<<<<< HEAD
-
-      pushStyle();
-      fill(34, 46, 200);
-      rectMode(CENTER);
-      rect(top.x, top.y, 100, 100);
-      print("Going up stairs. \n");
-      
-      popStyle();
-
-=======
->>>>>>> origin/master
-      // Set Path for Player to follow
-      path.setDimensions(bottom, top);
-      isClimbing = true;
-    }
-
-<<<<<<< HEAD
-    //    if (isClimbing)
-    //    {
-    //      if ( top.distanceTo(p) > 10 )
-    //      {
-    //        p.followPath(path);
-    //      }
-    //    }
-    //
-    //    if ( top.distanceTo(p) < 10 && p.keyHandle.isKeyDown('S') )
-    //    {
-    //      isClimbing = false;
-    //    }
-  }
-
-  public void GoDown(Node n) {
-    isClimbing = true;
-=======
-    if (isClimbing)
-    {
-      p.followPath(path);
-      if ( top.distanceTo(p) < 40 && ( p.keyHandle.isKeyDown('D') || p.keyHandle.isKeyDown('S') || p.keyHandle.isKeyDown('W') ))
-      {
-        isClimbing = false;
-      }
-    }
   }
 
   public void GoDown(Player p) 
   {
-    if ( top.distanceTo(p) < 30 && p.keyHandle.isKeyDown('S') )
-    {
-      // Set Path for Player to follow
-      path.setDimensions(top, bottom);
-      isGoingDown = true;
-    }
-    if (isGoingDown)
-    {
-      p.followPath(path);
-      if ( bottom.distanceTo(p) < 40 )
-      {
-        isGoingDown = false;
-      }
-    }
->>>>>>> origin/master
   }
 
   public void display()
   {
-    setBottomAndTop(x(), y(), bottom.x() + this.width, bottom.y() - this.height - 1);
+    Vec2 p = box2d.getBodyPixelCoord(body);
+    rect(p.x, p.y, 50, 50);
+    //    setBottomAndTop( x, y, bottom.x + this.width, bottom.y - this.height - 1);
     fill(myColor);
-    shape(s, x, y - this.height);
+    beginShape();
+    for (Vec2 v : steps) 
+    {
+      vertex(v.x, v.y);
+      //      vertex( box2d.scalarWorldToPixels(v.x) , box2d.scalarWorldToPixels(v.y) );
+    }
+    //    vertex(width, height);
+    //    vertex(0, height);
+    endShape(CLOSE);
   }
 
+  /* Step 1 Parent has it */
+
+  /* Step 2 Parent has it */
+
+  /* Step 3 */
+  void makeShape() 
+  {
+    steps = new ArrayList<Vec2>();
+    steps.add( new Vec2(  0, 140) );
+    steps.add( new Vec2(  0, 130) );
+    steps.add( new Vec2( 10, 130) );
+    steps.add( new Vec2( 10, 120) );
+    steps.add( new Vec2( 20, 120) );
+    steps.add( new Vec2( 20, 110) );
+    steps.add( new Vec2( 30, 110) );
+    steps.add( new Vec2( 30, 100) );
+    steps.add( new Vec2( 40, 100) );
+    steps.add( new Vec2( 40, 90) );
+    steps.add( new Vec2( 50, 90) );
+    steps.add( new Vec2( 50, 80) );
+    steps.add( new Vec2( 60, 80) );
+    steps.add( new Vec2( 60, 70) );
+    steps.add( new Vec2( 70, 70) );
+    steps.add( new Vec2( 70, 60) );
+    steps.add( new Vec2( 80, 60) );
+    steps.add( new Vec2( 80, 50) );
+    steps.add( new Vec2( 90, 50) );
+    steps.add( new Vec2( 90, 40) );
+    steps.add( new Vec2(100, 40) );
+    steps.add( new Vec2(100, 30) );
+    steps.add( new Vec2(110, 30) );
+    steps.add( new Vec2(110, 20) );
+    steps.add( new Vec2(120, 20) );
+    steps.add( new Vec2(120, 10) );
+    steps.add( new Vec2(130, 10) );
+    steps.add( new Vec2(130, 0) );
+    steps.add( new Vec2(140, 0) );
+    steps.add( new Vec2(140, 0) );
+    steps.add( new Vec2(140, 140) );
+
+    chain = new ChainShape();
+
+    Vec2[] vertices = new Vec2[steps.size() / 2]; /* Fix! Vertices of chain shape are too close */
+    for (int i = 0; i < vertices.length; i++) { /* Fix! Vertices of chain shape are too close */
+      vertices[i] = steps.get(i * 2);
+      vertices[i] = box2d.coordPixelsToWorld(steps.get(i * 2)); /* Fix! Vertices of chain shape are too close */
+    }
+
+    chain.createChain(vertices, vertices.length);
+  }
+  /* Step 4 */
+  void createFixture() 
+  {
+    fixtureDefinition = new FixtureDef();
+    fixtureDefinition.shape = chain;
+    // Parameters that affect physics
+    fixtureDefinition.density = 10;
+    fixtureDefinition.friction = 0.3;
+    fixtureDefinition.restitution = 0.5;
+    body.createFixture(fixtureDefinition);
+    //    body.createFixture(chain, 1);
+    println("Step 4 in ", this);
+  }
+
+  void createJoint() 
+  {
+  }
+  void cleanup()
+  {
+    // Let's find the screen position of the particle
+    Vec2 pos = box2d.getBodyPixelCoord(body);
+    // Is it off the bottom of the screen?
+    if (pos.y > height+radius*2) 
+    {
+      destroy();
+    }
+  }
 }
 

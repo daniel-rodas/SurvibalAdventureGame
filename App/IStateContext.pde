@@ -1,7 +1,5 @@
-interface ContextInterface
+interface IStateContext
 {
-
-  
   void setStates();
 
   /**
